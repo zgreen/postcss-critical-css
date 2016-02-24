@@ -5,7 +5,7 @@ Critical CSS for use with CSS Modules.
 ## About
 
 CSS Modules allow for locally scoped class names, which is great. But this makes
-critical CSS a challenge—class names will be hashed and added via JS. This
+critical CSS a challenge—class names will be hashed and added via JS. This plugin
 allows you to identify which among your CSS modules you want to include in a
 critical CSS file, and writes those styles to that file.
 
