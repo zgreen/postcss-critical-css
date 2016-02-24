@@ -1,0 +1,26 @@
+{
+  "name": "postcss-autoextend",
+  "version": "0.2.1",
+  "description": "Auto-generated hashed CSS placeholders",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zgreen/postcss-autoextend"
+  },
+  "scripts": {
+    "test": "tape test"
+  },
+  "keywords": [
+    "postcss-plugin",
+    "postcss",
+    "placeholder",
+    "extend",
+    "autoextend"
+  ],
+  "author": "Zach Green",
+  "license": "MIT",
+  "devDependencies": {
+    "postcss": "^5.0.5",
+    "tape": "^4.2.2"
+  }
+}
