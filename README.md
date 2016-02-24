@@ -31,7 +31,7 @@ Will output:
 ```
 
 Note that in the above example, the selector is rendered as it is written in the
-module. This may not be desireable, to you can alternatively identify the
+module. This may not be desireable, so you can alternatively identify the
 selector you'd like to use in your `critical.css`;
 ```css
 /* In locallyScopedClass.css */
@@ -58,4 +58,5 @@ Lots!
 
 - Tests
 - More tests
+- File output option(s)
 - More robust warnings
