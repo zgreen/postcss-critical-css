@@ -36,26 +36,32 @@ function getCriticalRules(css) {
       critical[dest] = [];
     }
 
-    if (decl.value === 'scope') {
-      let childRules = getChildRules(css, decl.parent);
+    switch (decl.value) {
+      case 'scope':
+        let childRules = getChildRules(css, decl.parent);
 
-      selectorReuseWarning(critical[dest], decl.parent.selector);
-      critical[dest].push(decl.parent);
+        selectorReuseWarning(critical[dest], decl.parent.selector);
+        critical[dest].push(decl.parent);
 
-      if (childRules !== null && childRules.length) {
-        childRules.forEach(rule => {
-          critical[dest].push(rule);
-        });
-      }
-    } else if (decl.value === 'this') {
-      selectorReuseWarning(critical[dest], decl.parent.selector);
-      critical[dest].push(decl.parent);
-    } else {
-      const container = decl.parent;
+        if (childRules !== null && childRules.length) {
+          childRules.forEach(rule => {
+            critical[dest].push(rule);
+          });
+        }
+        break;
 
-      container.selector = decl.value.replace(/['"]*/g, '');
-      selectorReuseWarning(critical[dest], container.selector);
-      critical[dest].push(container);
+      case 'this':
+        selectorReuseWarning(critical[dest], decl.parent.selector);
+        critical[dest].push(decl.parent);
+        break;
+
+      default:
+        const container = decl.parent;
+
+        container.selector = decl.value.replace(/['"]*/g, '');
+        selectorReuseWarning(critical[dest], container.selector);
+        critical[dest].push(container);
+        break;
     }
 
     decl.remove();
