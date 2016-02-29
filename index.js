@@ -65,10 +65,10 @@ function getCriticalRules(css) {
 }
 
 /**
- * Identify critical CSS selectors
+ * Get rules for selectors nested within parent node
  *
- * @param {obj} PostCSS CSS object.
- * @return {object} Object containing critical rules, organized by output destination
+ * @param {obj} PostCSS CSS object
+ * @return {object} Parent rule for which children should be included
  */
 function getChildRules(css, parent) {
   let ruleList = [];
