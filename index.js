@@ -21,24 +21,31 @@ function selectorReuseWarning(rules, selector) {
 }
 
 /**
- * Identify critical CSS rules.
+ * Identify critical CSS selectors
  *
  * @param {obj} PostCSS CSS object.
- * @return {array} Array of critical CSS rules.
+ * @return {object} Object containing critical rules, organized by output destination
  */
 function getCriticalRules(css) {
-  let critical = [];
+  let critical = {};
 
   css.walkDecls('critical-selector', (decl) => {
+    let dest = getDest(decl.parent);
+
+    if ('undefined' === typeof critical[dest]) {
+      critical[dest] = [];
+    }
+
     if (decl.value === 'this') {
-      selectorReuseWarning(critical, decl.parent.selector);
-      critical.push(decl.parent);
+      selectorReuseWarning(critical[dest], decl.parent.selector);
+      critical[dest].push(decl.parent);
     } else {
       const container = decl.parent;
       container.selector = decl.value;
-      selectorReuseWarning(critical, container.selector);
-      critical.push(container);
+      selectorReuseWarning(critical[dest], container.selector);
+      critical[dest].push(container);
     }
+
     decl.remove();
   });
 
@@ -46,50 +53,54 @@ function getCriticalRules(css) {
 }
 
 /**
- * Identify critical CSS rules.
+ * Identify critical CSS destinations.
  *
- * @param {obj} PostCSS CSS object.
- * @return {array} Array of critical CSS rules.
+ * @param {object} PostCSS rule.
+ * @return {array} string corresponding to output destination.
  */
-// function getCriticalDest(css) {
-//   let critical = [];
+function getDest(selector) {
+  let dest = 'critical'
 
-//   css.walkDecls('critical-dest', (decl) => {
-//     if (decl.value === 'this') {
-//       selectorReuseWarning(critical, decl.parent.selector);
-//       critical.push(decl.parent);
-//     } else {
-//       const container = decl.parent;
-//       container.selector = decl.value;
-//       selectorReuseWarning(critical, container.selector);
-//       critical.push(container);
-//     }
-//     decl.remove();
-//   });
+  selector.walkDecls('critical-dest', (decl) => {
+    dest = decl.value.replace(/['"]+/g, '');
+    decl.remove();
+  });
 
-//   return critical;
-// }
+  return dest;
+}
 
+/**
+ * Primary plugin function.
+ *
+ * @param {object} array of options.
+ * @return {function} function for PostCSS plugin.
+ */
 function buildCritical(options) {
   options = Object.assign({
     outputPath: process.cwd()
   }, options || {})
 
   return (css, result) => {
-    const criticalCSS = postcss.parse('');
-    let rules = getCriticalRules(css);
+    let criticalOutput = getCriticalRules(css);
 
-    rules = rules.reduce((init, rule) => {
-      rule.walkDecls('critical', (decl) => {
-        decl.remove();
-      });
-      criticalCSS.append(rule);
-      return rules;
-    }, {});
+    for (let dest in criticalOutput) {
+      let criticalCSS = postcss.parse('');
+      let critical = '';
+      let rules = [];
+      let destfilename = dest == 'critical.css' ? dest : dest + '-critical.css';
 
-    const critical = postcss().process(criticalCSS).css;
+      rules = criticalOutput[dest].reduce((init, rule) => {
+        rule.walkDecls('critical', (decl) => {
+          decl.remove();
+        });
+        criticalCSS.append(rule);
+        return criticalOutput[dest];
+      }, {});
 
-    fs.writeFile(path.join(options.outputPath, 'critical.css'), critical);
+      critical = postcss().process(criticalCSS).css;
+
+      fs.writeFile(path.join(options.outputPath, destfilename), critical);
+    }
   }
 }
 
