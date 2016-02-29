@@ -79,21 +79,49 @@ function getCriticalRules(css) {
 function getChildRules(css, parent) {
   let ruleList = [];
   let selectorRegExp = new RegExp('^' + parent.selector);
-  let childRegExp = new RegExp('^' + parent.selector + ' .*');
 
   css.walkRules(selectorRegExp, rule => {
-    let childMatch = null;
+    let isChild = matchChild(parent, rule);
 
-    if (rule.selector !== parent.selector) {
-      childMatch = rule.selector.match(childRegExp);
-
-      if (childMatch !== null) {
-        ruleList.push(rule);
-      }
+    if (isChild) {
+      ruleList.push(rule);
     }
   });
 
+  css.walkAtRules(atRule => {
+    atRule.walkRules(selectorRegExp, rule => {
+      let isChild = matchChild(parent, rule);
+      let criticalAtRule = postcss.atRule({
+        name: atRule.name,
+        params: atRule.params
+      });
+
+      // Should append even if parent selector
+      if (rule.selector === parent.selector || isChild) {
+        criticalAtRule.append(rule);
+        ruleList.push(criticalAtRule);
+      }
+    })
+  });
+
   return ruleList;
+}
+
+/**
+ * Get rules for selectors nested within parent node
+ *
+ * @param {obj} PostCSS CSS object
+ * @return {object} Parent rule for which children should be included
+ */
+function matchChild(parent, rule) {
+  let childRegExp = new RegExp('^' + parent.selector + ' .*');
+  let childMatch = rule.selector.match(childRegExp);
+
+  if (rule.selector !== parent.selector && childMatch !== null) {
+    return true
+  }
+
+  return false;
 }
 
 /**
@@ -131,7 +159,9 @@ function buildCritical(options) {
       let criticalCSS = postcss.parse('');
       let critical = '';
       let rules = [];
-      let destfilename = dest == 'critical.css' ? dest : dest + '-critical.css';
+      let destfilename = dest == 'critical' ? dest : dest + '-critical';
+
+      destfilename += '.css';
 
       rules = criticalOutput[dest].reduce((init, rule) => {
         rule.walkDecls('critical', (decl) => {
