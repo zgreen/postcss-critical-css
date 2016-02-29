@@ -1,26 +1,21 @@
 {
-  "name": "postcss-autoextend",
-  "version": "0.2.1",
-  "description": "Auto-generated hashed CSS placeholders",
+  "name": "postcss-critical-css",
+  "version": "0.0.1",
+  "description": "Generate critical CSS using PostCSS",
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/zgreen/postcss-autoextend"
-  },
-  "scripts": {
-    "test": "tape test"
+    "url": "https://github.com/zgreen/postcss-critical-css"
   },
   "keywords": [
     "postcss-plugin",
     "postcss",
-    "placeholder",
-    "extend",
-    "autoextend"
+    "critical-css",
+    "css"
   ],
   "author": "Zach Green",
   "license": "MIT",
   "devDependencies": {
-    "postcss": "^5.0.5",
-    "tape": "^4.2.2"
+    "postcss": "^5.0.5"
   }
 }
