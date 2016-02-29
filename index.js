@@ -29,19 +29,31 @@ function selectorReuseWarning(rules, selector) {
 function getCriticalRules(css) {
   let critical = {};
 
-  css.walkDecls('critical-selector', (decl) => {
+  css.walkDecls('critical-selector', decl => {
     let dest = getDest(decl.parent);
 
     if ('undefined' === typeof critical[dest]) {
       critical[dest] = [];
     }
 
-    if (decl.value === 'this') {
+    if (decl.value === 'scope') {
+      let childRules = getChildRules(css, decl.parent);
+
+      selectorReuseWarning(critical[dest], decl.parent.selector);
+      critical[dest].push(decl.parent);
+
+      if (childRules !== null && childRules.length) {
+        childRules.forEach(rule => {
+          critical[dest].push(rule);
+        });
+      }
+    } else if (decl.value === 'this') {
       selectorReuseWarning(critical[dest], decl.parent.selector);
       critical[dest].push(decl.parent);
     } else {
       const container = decl.parent;
-      container.selector = decl.value;
+
+      container.selector = decl.value.replace(/['"]*/g, '');
       selectorReuseWarning(critical[dest], container.selector);
       critical[dest].push(container);
     }
@@ -53,6 +65,32 @@ function getCriticalRules(css) {
 }
 
 /**
+ * Identify critical CSS selectors
+ *
+ * @param {obj} PostCSS CSS object.
+ * @return {object} Object containing critical rules, organized by output destination
+ */
+function getChildRules(css, parent) {
+  let ruleList = [];
+  let selectorRegExp = new RegExp('^' + parent.selector);
+  let childRegExp = new RegExp('^' + parent.selector + ' .*');
+
+  css.walkRules(selectorRegExp, rule => {
+    let childMatch = null;
+
+    if (rule.selector !== parent.selector) {
+      childMatch = rule.selector.match(childRegExp);
+
+      if (childMatch !== null) {
+        ruleList.push(rule);
+      }
+    }
+  });
+
+  return ruleList;
+}
+
+/**
  * Identify critical CSS destinations.
  *
  * @param {object} PostCSS rule.
@@ -61,8 +99,8 @@ function getCriticalRules(css) {
 function getDest(selector) {
   let dest = 'critical'
 
-  selector.walkDecls('critical-dest', (decl) => {
-    dest = decl.value.replace(/['"]+/g, '');
+  selector.walkDecls('critical-dest', decl => {
+    dest = decl.value.replace(/['"]*/g, '');
     decl.remove();
   });
 
