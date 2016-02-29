@@ -2,6 +2,7 @@
 
 var postcss = require('postcss');
 var fs = require('fs');
+var path = require('path');
 
 /**
  * Throw a warning if a critical selector is used more than once.
@@ -27,7 +28,8 @@ function selectorReuseWarning(rules, selector) {
  */
 function getCriticalRules(css) {
   let critical = [];
-  css.walkDecls('critical', (decl) => {
+
+  css.walkDecls('critical-selector', (decl) => {
     if (decl.value === 'this') {
       selectorReuseWarning(critical, decl.parent.selector);
       critical.push(decl.parent);
@@ -39,13 +41,44 @@ function getCriticalRules(css) {
     }
     decl.remove();
   });
+
   return critical;
 }
 
-module.exports = postcss.plugin('postcss-critical', () => {
+/**
+ * Identify critical CSS rules.
+ *
+ * @param {obj} PostCSS CSS object.
+ * @return {array} Array of critical CSS rules.
+ */
+// function getCriticalDest(css) {
+//   let critical = [];
+
+//   css.walkDecls('critical-dest', (decl) => {
+//     if (decl.value === 'this') {
+//       selectorReuseWarning(critical, decl.parent.selector);
+//       critical.push(decl.parent);
+//     } else {
+//       const container = decl.parent;
+//       container.selector = decl.value;
+//       selectorReuseWarning(critical, container.selector);
+//       critical.push(container);
+//     }
+//     decl.remove();
+//   });
+
+//   return critical;
+// }
+
+function buildCritical(options) {
+  options = Object.assign({
+    outputPath: process.cwd()
+  }, options || {})
+
   return (css, result) => {
     const criticalCSS = postcss.parse('');
     let rules = getCriticalRules(css);
+
     rules = rules.reduce((init, rule) => {
       rule.walkDecls('critical', (decl) => {
         decl.remove();
@@ -53,7 +86,11 @@ module.exports = postcss.plugin('postcss-critical', () => {
       criticalCSS.append(rule);
       return rules;
     }, {});
+
     const critical = postcss().process(criticalCSS).css;
-    fs.writeFile('critical.css', critical);
+
+    fs.writeFile(path.join(options.outputPath, 'critical.css'), critical);
   }
-});
+}
+
+module.exports = postcss.plugin('postcss-critical', buildCritical);
