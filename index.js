@@ -26,7 +26,7 @@ function selectorReuseWarning(rules, selector) {
  * @param {obj} PostCSS CSS object.
  * @return {object} Object containing critical rules, organized by output destination
  */
-function getCriticalRules(css) {
+function getCriticalRules(css, preserve) {
   let critical = {};
 
   css.walkDecls('critical-selector', decl => {
@@ -38,11 +38,16 @@ function getCriticalRules(css) {
 
     switch (decl.value) {
       case 'scope':
-        let childRules = getChildRules(css, decl.parent);
+        let childRules = getChildRules(css, decl.parent, preserve);
 
         selectorReuseWarning(critical[dest], decl.parent.selector);
-        critical[dest].push(decl.parent);
 
+        // Make sure the parent selector contains declarations
+        if (decl.parent.nodes.length > 1) {
+          critical[dest].push(decl.parent);
+        }
+
+        // Push all child rules
         if (childRules !== null && childRules.length) {
           childRules.forEach(rule => {
             critical[dest].push(rule);
@@ -74,34 +79,50 @@ function getCriticalRules(css) {
  * Get rules for selectors nested within parent node
  *
  * @param {obj} PostCSS CSS object
- * @return {object} Parent rule for which children should be included
+ * @param {object} Parent rule for which children should be included
+ * @param {bool} Whether or not to keep the critical rule in the stylesheet
  */
-function getChildRules(css, parent) {
+function getChildRules(css, parent, preserve) {
   let ruleList = [];
-  let selectorRegExp = new RegExp('^' + parent.selector);
+  let selectorRegExp = new RegExp(parent.selector);
 
+  // Walk all rules to mach child selectors
   css.walkRules(selectorRegExp, rule => {
-    let isChild = matchChild(parent, rule);
+    let childRule = matchChild(parent, rule);
 
-    if (isChild) {
+    if (childRule) {
+      // Create new rule to append only necessary declarations to critical
+      // (avoids huge @extend selectors)
+      // let criticalRule = rule.clone();
+
+      console.log(rule.selector);
+      console.log(childRule);
+
       ruleList.push(rule);
     }
   });
 
+  // Walk all at-rules to match nested child selectors
   css.walkAtRules(atRule => {
     atRule.walkRules(selectorRegExp, rule => {
-      let isChild = matchChild(parent, rule);
+      let childRule = matchChild(parent, rule);
+
+      // Create new at-rule to append only necessary selector to critical
       let criticalAtRule = postcss.atRule({
         name: atRule.name,
         params: atRule.params
       });
 
       // Should append even if parent selector
-      if (rule.selector === parent.selector || isChild) {
+      if (rule.selector === parent.selector || childRule) {
         criticalAtRule.append(rule);
         ruleList.push(criticalAtRule);
+
+        if (!preserve) {
+          rule.remove();
+        }
       }
-    })
+    });
   });
 
   return ruleList;
@@ -114,11 +135,11 @@ function getChildRules(css, parent) {
  * @return {object} Parent rule for which children should be included
  */
 function matchChild(parent, rule) {
-  let childRegExp = new RegExp('^' + parent.selector + ' .*');
+  let childRegExp = new RegExp('(, )?(' + parent.selector + ' [^,\s]*),?.*');
   let childMatch = rule.selector.match(childRegExp);
 
   if (rule.selector !== parent.selector && childMatch !== null) {
-    return true
+    return true;
   }
 
   return false;
@@ -149,11 +170,12 @@ function getDest(selector) {
  */
 function buildCritical(options) {
   options = Object.assign({
-    outputPath: process.cwd()
+    outputPath: process.cwd(),
+    preserve: true
   }, options || {})
 
   return (css, result) => {
-    let criticalOutput = getCriticalRules(css);
+    let criticalOutput = getCriticalRules(css, options.preserve);
 
     for (let dest in criticalOutput) {
       let criticalCSS = postcss.parse('');
@@ -168,6 +190,11 @@ function buildCritical(options) {
           decl.remove();
         });
         criticalCSS.append(rule);
+
+        if (rule.type === 'rule' && !options.preserve) {
+          rule.remove();
+        }
+
         return criticalOutput[dest];
       }, {});
 
