@@ -16,6 +16,7 @@
   "author": "Zach Green",
   "license": "MIT",
   "devDependencies": {
+    "cssnano": "^3.5.2",
     "postcss": "^5.0.5"
   }
 }

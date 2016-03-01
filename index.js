@@ -1,6 +1,7 @@
 'use strict';
 
 var postcss = require('postcss');
+var cssnano = require('cssnano');
 var fs = require('fs');
 var path = require('path');
 
@@ -91,13 +92,6 @@ function getChildRules(css, parent, preserve) {
     let childRule = matchChild(parent, rule);
 
     if (childRule) {
-      // Create new rule to append only necessary declarations to critical
-      // (avoids huge @extend selectors)
-      // let criticalRule = rule.clone();
-
-      console.log(rule.selector);
-      console.log(childRule);
-
       ruleList.push(rule);
     }
   });
@@ -171,7 +165,8 @@ function getDest(selector) {
 function buildCritical(options) {
   options = Object.assign({
     outputPath: process.cwd(),
-    preserve: true
+    preserve: true,
+    minify: true
   }, options || {})
 
   return (css, result) => {
@@ -182,6 +177,7 @@ function buildCritical(options) {
       let critical = '';
       let rules = [];
       let destfilename = dest == 'critical' ? dest : dest + '-critical';
+      let plugins = options.minify ? [cssnano()] : [];
 
       destfilename += '.css';
 
@@ -198,9 +194,15 @@ function buildCritical(options) {
         return criticalOutput[dest];
       }, {});
 
-      critical = postcss().process(criticalCSS).css;
+      if (options.minify) {
 
-      fs.writeFile(path.join(options.outputPath, destfilename), critical);
+      }
+
+      postcss(plugins)
+        .process(criticalCSS)
+        .then(result => {
+          fs.writeFile(path.join(options.outputPath, destfilename), result);
+        });
     }
   }
 }
