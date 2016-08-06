@@ -1,0 +1,15 @@
+.foo {
+  border: 3px solid gray;
+  display: flex;
+  padding: 1em;
+}
+
+.foo a {
+  color: blue;
+  text-decoration: none;
+}
+
+.foo .bar {
+  content: 'testing';
+  width: calc(100% - 20px);
+}

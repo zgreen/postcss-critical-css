@@ -1,0 +1,5 @@
+.foo {
+  color: tomato;
+  critical-selector: .bar;
+  position: absolute;
+}
