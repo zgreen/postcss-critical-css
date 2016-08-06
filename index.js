@@ -194,10 +194,6 @@ function buildCritical(options) {
         return criticalOutput[dest];
       }, {});
 
-      if (options.minify) {
-
-      }
-
       postcss(plugins)
         .process(criticalCSS)
         .then(result => {
