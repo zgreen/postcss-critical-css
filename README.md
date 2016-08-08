@@ -77,12 +77,12 @@ Will output:
 
 And what if you need to output multiple critical CSS files
 (for example, if you have two different templates that do not share styles)?
-You can do that as well. Alternate destinations will be named `[destination]-critical.css`.
+You can do that as well.
 ```css
 /* in foo.css */
 .foo {
   critical-selector: this;
-  critical-dest: secondary;
+  critical-filename: secondary-critical.css;
   border: 3px solid gray;
   display: flex;
   padding: 1em;
