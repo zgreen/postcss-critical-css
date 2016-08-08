@@ -1,6 +1,6 @@
 # PostCSS Critical CSS
 
-This plugin allows you to define and output critical CSS using custom CSS properties. You can define
+This plugin allows you to define and output critical CSS using custom CSS properties.
 
 ## Example
 
