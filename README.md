@@ -2,6 +2,10 @@
 
 This plugin allows you to define and output critical CSS using custom CSS properties.
 
+## Install
+
+`npm install postcss-critical-css --save-dev`
+
 ## Example
 
 ```css
