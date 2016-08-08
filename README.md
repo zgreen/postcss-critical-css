@@ -1,19 +1,12 @@
 # PostCSS Critical CSS
 
-Critical CSS for use with CSS Modules.
-
-## About
-
-CSS Modules allow for locally scoped class names, which is great. But this makes
-critical CSS a challenge—class names will be hashed and added via JS. This plugin
-allows you to identify which among your CSS modules you want to include in a
-critical CSS file, and writes those styles to that file.
+This plugin allows you to define and output critical CSS using custom CSS properties. You can define
 
 ## Example
 
 ```css
-/* In locallyScopedClass.css */
-.locallyScopedClass {
+/* In foo.css */
+.foo {
   critical-selector: this;
   border: 3px solid gray;
   display: flex;
@@ -23,7 +16,7 @@ critical CSS file, and writes those styles to that file.
 Will output:
 ```css
 /* In critical.css */
-.locallyScopedClass {
+.foo {
   border: 3px solid gray;
   display: flex;
   padding: 1em;
@@ -34,8 +27,8 @@ Note that in the above example, the selector is rendered as it is written in the
 module. This may not be desireable, so you can alternatively identify the
 selector you'd like to use in your `critical.css`;
 ```css
-/* In locallyScopedClass.css */
-.locallyScopedClass {
+/* In foo.css */
+.foo {
   critical-selector: .custom-selector;
   border: 3px solid gray;
   display: flex;
@@ -54,15 +47,15 @@ Will output:
 
 If you'd like to ouptut the entire scope of a module, including children, you can!
 ```css
-/* in locallyScopedClass.css */
-.locallyScopedClass {
+/* in foo.css */
+.foo {
   critical-selector: scope;
   border: 3px solid gray;
   display: flex;
   padding: 1em;
 }
 
-.locallyScopedClass a {
+.foo a {
   color: blue;
   text-decoration: none;
 }
@@ -70,13 +63,13 @@ If you'd like to ouptut the entire scope of a module, including children, you ca
 Will output:
 ```css
 /* In critical.css */
-.locallyScopedClass {
+.foo {
   border: 3px solid gray;
   display: flex;
   padding: 1em;
 }
 
-.locallyScopedClass a {
+.foo a {
   color: blue;
   text-decoration: none;
 }
@@ -86,8 +79,8 @@ And what if you need to output multiple critical CSS files
 (for example, if you have two different templates that do not share styles)?
 You can do that as well. Alternate destinations will be named `[destination]-critical.css`.
 ```css
-/* in locallyScopedClass.css */
-.locallyScopedClass {
+/* in foo.css */
+.foo {
   critical-selector: this;
   critical-dest: secondary;
   border: 3px solid gray;
@@ -98,7 +91,7 @@ You can do that as well. Alternate destinations will be named `[destination]-cri
 Will output:
 ```css
 /* In secondary-critical.css */
-.locallyScopedClass {
+.foo {
   border: 3px solid gray;
   display: flex;
   padding: 1em;
@@ -123,9 +116,6 @@ Default: true
 
 ## To Dos
 
-Lots!
-
 - Tests
 - More tests
-- File output option(s)
 - More robust warnings
