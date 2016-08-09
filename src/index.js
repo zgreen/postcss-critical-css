@@ -175,7 +175,6 @@ function buildCritical(options) {
     let criticalOutput = getCriticalRules(css, args.preserve);
 
     for (let fileName in criticalOutput) {
-      console.log(fileName);
       let criticalCSS = postcss.parse('');
       let critical = '';
       let rules = [];

@@ -164,13 +164,12 @@ function getDest(selector) {
  * @return {function} function for PostCSS plugin.
  */
 function buildCritical(options) {
-  var args = Object.assign({
+  var args = Object.assign({}, {
     outputPath: process.cwd(),
     preserve: true,
     minify: true,
     dryRun: false
-  }, options || {});
-
+  }, options);
   return function (css, result) {
     var criticalOutput = getCriticalRules(css, args.preserve);
 
@@ -195,7 +194,7 @@ function buildCritical(options) {
 
       postcss(plugins).process(criticalCSS).then(function (result) {
         if (!args.dryRun) {
-          fs.writeFile(path.join(args.outputPath, fileName), result);
+          fs.writeFileSync(path.join(args.outputPath, fileName), result);
         } else {
           console.log(chalk.green('\nCritical CSS result is:\n' + chalk.yellow(result.css)));
           return '\nCritical CSS result is:\n' + result.css;
