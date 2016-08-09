@@ -1,6 +1,6 @@
 {
   "name": "postcss-critical-css",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Generate critical CSS using PostCSS",
   "main": "index.js",
   "repository": {
