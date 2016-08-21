@@ -52,3 +52,13 @@ test('Testing "this" non-critical result', function(t) {
   compareFixtures(t, 'this');
   t.end();
 });
+
+test('Testing "this" critical result', function(t) {
+  compareCritical(t, 'atRule');
+  t.end();
+});
+
+test('Testing "this" non-critical result', function(t) {
+  compareFixtures(t, 'atRule');
+  t.end();
+});
