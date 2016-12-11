@@ -1,29 +1,9 @@
 {
-  "extends": "airbnb/base",
-  "ecmaFeatures": {
-    "arrowFunctions": true,
-    "blockBindings": true,
-    "classes": true,
-    "defaultParams": true,
-    "modules": true
-  },
-  "parser": "babel-eslint",
+  "extends": "standard",
   "plugins": [
     "flowtype"
   ],
-  "parserOptions": {
-    "ecmaVersion": 6,
-    "ecmaFeatures": {
-      "jsx": true
-      },
-      "sourceType": "module"
-  },
-  "env": {
-    "es6": true,
-    "browser": true,
-    "node": true,
-    "commonjs": true
-  },
+  "parser": "babel-eslint",
   "rules": {
     "flowtype/define-flow-type": 1,
     "flowtype/require-parameter-type": 1,
