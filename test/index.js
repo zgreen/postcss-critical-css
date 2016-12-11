@@ -39,6 +39,16 @@ test('Testing "atRule" non-critical result', function(t) {
   t.end();
 });
 
+test(chalk.yellow(`Testing ${chalk.bold('atRule.wrapping')} critical result`), function(t) {
+  compareCritical(t, 'atRule-wrapping');
+  t.end();
+});
+
+test(chalk.yellow(`Testing ${chalk.bold('atRule.wrapping')} non-critical result`), function(t) {
+  compareCritical(t, 'atRule-wrapping', true);
+  t.end();
+});
+
 test('Testing "media" critical result', function(t) {
   compareCritical(t, 'media');
   t.end();
