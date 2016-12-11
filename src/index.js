@@ -5,8 +5,6 @@ import postcss from 'postcss'
 import cssnano from 'cssnano'
 import fs from 'fs'
 import path from 'path'
-// import { getCriticalFromAtRule } from './atRule'
-// import { getCriticalDestination } from './getCriticalDestination'
 import { getCriticalRules } from './getCriticalRules'
 
 /**
@@ -35,18 +33,6 @@ function buildCritical (options: ArgsType): Function {
     return Object.keys(criticalOutput).reduce((init: Object, cur: string): Object => {
       const criticalCSS = postcss.root()
       criticalCSS.append(criticalOutput[cur])
-      // criticalOutput[cur].forEach((rule) => {
-      //
-      //   rule.walkDecls('critical', (decl: Object) => {
-      //     console.log('walking critical')
-      //     decl.remove()
-      //     criticalCSS.append(rule)
-      //     if (rule.type === 'rule' && !args.preserve) {
-      //       rule.remove()
-      //     }
-      //   })
-      // })
-
       postcss(args.minify ? [cssnano()] : [])
         .process(criticalCSS)
         .then((result: Object) => {

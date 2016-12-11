@@ -1,5 +1,3 @@
-@critical atRule.critical.actual.css;
-
 .foo {
   display: flex;
   width: calc(100% - 200px);

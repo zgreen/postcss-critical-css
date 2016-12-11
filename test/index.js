@@ -25,16 +25,16 @@ test('Testing "this" critical result', function(t) {
 });
 
 test('Testing "this" non-critical result', function(t) {
-  compareCritical(t, 'this');
+  compareCritical(t, 'this', true);
   t.end();
 });
-//
-// test('Testing "this" critical result', function(t) {
-//   compareCritical(t, 'atRule');
-//   t.end();
-// });
-//
-// test('Testing "this" non-critical result', function(t) {
-//   compareFixtures(t, 'atRule');
-//   t.end();
-// });
+
+test('Testing "atRule" critical result', function(t) {
+  compareCritical(t, 'atRule');
+  t.end();
+});
+
+test('Testing "atRule" non-critical result', function(t) {
+  compareCritical(t, 'atRule', true);
+  t.end();
+});

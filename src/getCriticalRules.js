@@ -1,6 +1,7 @@
 // @flow
 
 import { getChildRules } from './getChildRules'
+import { getCriticalFromAtRule } from './atRule'
 import { getCriticalDestination } from './getCriticalDestination'
 
 /**
@@ -10,8 +11,7 @@ import { getCriticalDestination } from './getCriticalDestination'
  * @return {object} Object containing critical rules, organized by output destination
  */
 export function getCriticalRules (css: Object, shouldPreserve: boolean): Object {
-  const critical = {}
-
+  const critical = getCriticalFromAtRule({ css })
   css.walkDecls('critical-selector', (decl: Object) => {
     const dest = getCriticalDestination(decl.parent)
     const container = decl.parent
