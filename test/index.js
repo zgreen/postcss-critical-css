@@ -38,3 +38,13 @@ test('Testing "atRule" non-critical result', function(t) {
   compareCritical(t, 'atRule', true);
   t.end();
 });
+
+test('Testing "media" critical result', function(t) {
+  compareCritical(t, 'media');
+  t.end();
+});
+
+test('Testing "media" non-critical result', function(t) {
+  compareCritical(t, 'media', true);
+  t.end();
+});

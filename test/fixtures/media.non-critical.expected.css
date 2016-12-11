@@ -1,0 +1,6 @@
+@media (min-width: 700px) {
+  .foo {
+    color: red;
+    width: 100%;
+  }
+}
