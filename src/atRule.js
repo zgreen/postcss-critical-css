@@ -14,7 +14,7 @@ export function getCriticalFromAtRule (args: ArgsType): Object {
     ...args
   }
   options.css.walkAtRules('critical', (rule: Object) => {
-    result[rule.params ? rule.params : options.filename] = rule.nodes.length
+    result[rule.params ? rule.params : options.filename] = rule.nodes
       ? rule.nodes
       : rule.parent
     rule.remove()
