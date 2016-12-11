@@ -29,6 +29,7 @@ function buildCritical (options: ArgsType): Function {
     minify: true,
     dryRun: false
   }, options)
+  console.log(args)
   return (css: Object) => {
     let criticalOutput = getCriticalRules(css, args.preserve)
     criticalOutput = Object.keys(criticalOutput).reduce((init: Object, cur: string): Object => {

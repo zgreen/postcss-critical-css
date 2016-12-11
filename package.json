@@ -38,7 +38,7 @@
     "tape": "^4.6.0"
   },
   "scripts": {
-    "build": "eslint src/** && npm run flow && babel src/index.js --out-file index.js",
+    "build": "eslint src/** && npm run flow && babel src --out-dir lib",
     "flow": "flow; test $? -eq 0 -o $? -eq 2",
     "eslint": "eslint src/**",
     "start": "eslint src/** && npm run flow && babel src/index.js --out-file index.js --watch",
