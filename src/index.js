@@ -23,36 +23,37 @@ type ArgsType = {
 }
 
 function buildCritical (options: ArgsType): Function {
-  const args = Object.assign({}, {
+  const args = {
     outputPath: process.cwd(),
     preserve: true,
     minify: true,
-    dryRun: false
-  }, options)
-  console.log(args)
+    dryRun: false,
+    ...options
+  }
   return (css: Object) => {
     let criticalOutput = getCriticalRules(css, args.preserve)
-    criticalOutput = Object.keys(criticalOutput).reduce((init: Object, cur: string): Object => {
+    return Object.keys(criticalOutput).reduce((init: Object, cur: string): Object => {
       const criticalCSS = postcss.root()
-
-      Object.keys(criticalOutput[criticalOutput[cur].fileName]).forEach((key: string) => {
-        const rule = criticalOutput[criticalOutput[cur].fileName][key]
-        rule.walkDecls('critical', (decl: Object) => {
-          decl.remove()
-        })
-        criticalCSS.append(rule)
-        if (rule.type === 'rule' && !args.preserve) {
-          rule.remove()
-        }
-      })
+      criticalCSS.append(criticalOutput[cur])
+      // criticalOutput[cur].forEach((rule) => {
+      //
+      //   rule.walkDecls('critical', (decl: Object) => {
+      //     console.log('walking critical')
+      //     decl.remove()
+      //     criticalCSS.append(rule)
+      //     if (rule.type === 'rule' && !args.preserve) {
+      //       rule.remove()
+      //     }
+      //   })
+      // })
 
       postcss(args.minify ? [cssnano()] : [])
         .process(criticalCSS)
         .then((result: Object) => {
           if (!args.dryRun) {
-            fs.writeFileSync(
-              path.join(args.outputPath, criticalOutput[cur].fileName),
-              result
+            fs.writeFile(
+              path.join(args.outputPath, cur),
+              result.css
             )
           } else {
             console.log( // eslint-disable-line no-console

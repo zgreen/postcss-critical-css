@@ -6,7 +6,7 @@ import { getCriticalDestination } from './getCriticalDestination'
 /**
  * Identify critical CSS selectors
  *
- * @param {obj} PostCSS CSS object.
+ * @param {object} PostCSS CSS object.
  * @return {object} Object containing critical rules, organized by output destination
  */
 export function getCriticalRules (css: Object, shouldPreserve: boolean): Object {
@@ -49,6 +49,5 @@ export function getCriticalRules (css: Object, shouldPreserve: boolean): Object 
 
     decl.remove()
   })
-
   return critical
 }
