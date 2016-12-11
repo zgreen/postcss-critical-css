@@ -14,7 +14,9 @@ export function getCriticalRules (css: Object, shouldPreserve: boolean): Object 
   const critical = getCriticalFromAtRule({ css })
   css.walkDecls('critical-selector', (decl: Object) => {
     const dest = getCriticalDestination(decl.parent)
-    const container = decl.parent
+    const container = decl.parent.parent.type === 'atrule'
+      ? decl.parent.parent
+      : decl.parent
     const childRules = decl.value === 'scope'
       ? getChildRules(css, decl.parent, shouldPreserve)
       : []
@@ -26,7 +28,7 @@ export function getCriticalRules (css: Object, shouldPreserve: boolean): Object 
       case 'scope':
         // Make sure the parent selector contains declarations
         if (decl.parent.nodes.length > 1) {
-          critical[dest].push(decl.parent)
+          critical[dest].push(container)
         }
 
         // Push all child rules
@@ -38,7 +40,7 @@ export function getCriticalRules (css: Object, shouldPreserve: boolean): Object 
         break
 
       case 'this':
-        critical[dest].push(decl.parent)
+        critical[dest].push(container)
         break
 
       default:
