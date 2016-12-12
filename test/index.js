@@ -58,3 +58,13 @@ test('Testing "media" non-critical result', function(t) {
   compareCritical(t, 'media', true);
   t.end();
 });
+
+test(chalk.yellow(`Testing ${chalk.bold('scope')} critical result`), function(t) {
+  compareCritical(t, 'scope');
+  t.end();
+});
+
+test(chalk.yellow(`Testing ${chalk.bold('scope')} non-critical result`), function(t) {
+  compareCritical(t, 'scope', true);
+  t.end();
+});

@@ -10,13 +10,7 @@ function cb (files) {
     postcss([postcssCriticalCSS({outputPath: basePath})])
       .process(data)
       .then(result => fs.writeFile(
-        `${basePath}/${file.split('.')[0]}.non-critical.css`,
-        result.css,
-        (err) => {
-          if (err) {
-            console.log(err)
-          }
-        })
+        `${basePath}/${file.split('.')[0]}.non-critical.css`, result.css))
   }
   files.forEach(function(file) {
     if (file === 'example.css') {

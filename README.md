@@ -1,17 +1,20 @@
 # PostCSS Critical CSS
 
-This plugin allows you to define and output critical CSS using custom CSS properties.
+This plugin allows the user to define and output critical CSS using custom atRules, and/or custom CSS properties. Critical CSS may be output to one or more files, as defined within the plugin options or within the CSS.
 
 ## Install
 
 `npm install postcss-critical-css --save-dev`
 
-## Example
+## Examples
+
+A live example is available in this repo. See the `/example` directory, and use the command `npm run example` to test it out.
 
 ```css
 /* In foo.css */
+@critical;
+
 .foo {
-  critical-selector: this;
   border: 3px solid gray;
   display: flex;
   padding: 1em;
@@ -104,22 +107,13 @@ Will output:
 
 ## Options
 
-**outputPath**
-Path to which critical CSS should be output
-Default: current working directory
-
-**preserve**
-Whether or not to remove selectors from primary CSS document once they've been marked as critical.
-This should prevent duplication of selectors across critical and non-critical CSS.
-WARNING: this is a destructive option and may break styles relying on the cascade!
-Default: true
-
-**minify**
-Minify output CSS
-Default: true
+| Arg          | Type      | Description                                 | Default |
+| ------------ | --------- | ------------------------------------------- | ------------------------- |
+| `outputPath` | `string`  | Path to which critical CSS should be output | Current working directory |
+| `preserve`   | `boolean` | Whether or not to remove selectors from primary CSS document once they've been marked as critical. This should prevent duplication of selectors across critical and non-critical CSS. | `true` |
+| `minify`     | `boolean` | Minify output CSS? | `true` |
 
 ## To Dos
 
-- Tests
 - More tests
 - More robust warnings

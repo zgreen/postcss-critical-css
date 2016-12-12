@@ -28,7 +28,7 @@ function buildCritical (options: ArgsType): Function {
     dryRun: false,
     ...options
   }
-  return (css: Object) => {
+  return (css: Object): Object => {
     let criticalOutput = getCriticalRules(css, args.preserve)
     return Object.keys(criticalOutput).reduce((init: Object, cur: string): Object => {
       const criticalCSS = postcss.root()

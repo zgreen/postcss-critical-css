@@ -31,12 +31,13 @@ export function getCriticalRules (css: Object, shouldPreserve: boolean): Object 
           critical[dest].push(container)
         }
 
-        // Push all child rules
+        // Add all child rules
         if (childRules !== null && childRules.length) {
-          childRules.forEach((rule: Object) => {
-            critical[dest].push(rule)
-          })
+          critical[dest] = critical[dest].concat(childRules)
         }
+        // Ensure source ordering is correct.
+        critical[dest] = critical[dest]
+          .sort((a: Object, b: Object) => a.source.start.line - b.source.start.line)
         break
 
       case 'this':
