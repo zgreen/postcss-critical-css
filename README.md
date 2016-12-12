@@ -177,7 +177,9 @@ Will output:
 }
 ```
 
-## Options
+## Plugin options
+
+The plugin takes a single object as its only parameter. The following properties are valid:
 
 | Arg          | Type      | Description                                 | Default |
 | ------------ | --------- | ------------------------------------------- | ------------------------- |
