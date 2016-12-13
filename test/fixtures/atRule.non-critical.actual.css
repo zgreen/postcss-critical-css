@@ -7,8 +7,3 @@
   border: 10px solid gold;
   height: 100%;
 }
-
-.baz::before {
-  content: 'test';
-  position: fixed;
-}
