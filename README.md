@@ -36,7 +36,7 @@ Will output:
 
 ```css
 /* In foo.css */
-@critical bar;
+@critical bar.css;
 
 .foo {
   border: 3px solid gray;
@@ -73,7 +73,7 @@ Will output:
 ```
 Will output:
 ```css
-/* In bar.css */
+/* In critical.css */
 .bar {
   border: 10px solid gold;
   color: gold;
