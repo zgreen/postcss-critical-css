@@ -4,18 +4,16 @@ var test = require('tape')
 var postcss = require('postcss')
 var postcssCriticalCSS = require('..');
 
-const basePath = `${process.cwd()}/test/fixtures`;
+const basePath = `${process.cwd()}/example`;
 function cb (files) {
   function useFileData (data, file) {
     postcss([postcssCriticalCSS({outputPath: basePath})])
       .process(data)
-      .then(result => fs.writeFile(`${basePath}/${file.split('.')[0]}.non-critical.actual.css`, result.css))
+      .then(result => fs.writeFile(
+        `${basePath}/${file.split('.')[0]}.non-critical.css`, result.css))
   }
   files.forEach(function(file) {
-    if (file.indexOf('.actual') !== -1) {
-      fs.unlink(`${basePath}/${file}`)
-    }
-    if (file.indexOf('.expected') === -1 && file.indexOf('.actual') === -1) {
+    if (file === 'example.css') {
       fs.readFile(`${basePath}/${file}`, 'utf8', (err, data) => {
         if (err) {
           throw new Error(err)

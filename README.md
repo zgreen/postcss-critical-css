@@ -1,12 +1,86 @@
 # PostCSS Critical CSS
 
-This plugin allows you to define and output critical CSS using custom CSS properties.
+This plugin allows the user to define and output critical CSS using custom atRules, and/or custom CSS properties. Critical CSS may be output to one or more files, as defined within the plugin options or within the CSS.
 
 ## Install
 
 `npm install postcss-critical-css --save-dev`
 
-## Example
+## Examples
+
+A live example is available in this repo. See the `/example` directory, and use the command `npm run example` to test it out.
+
+### Using the `@critical` atRule
+
+```css
+/* In foo.css */
+@critical;
+
+.foo {
+  border: 3px solid gray;
+  display: flex;
+  padding: 1em;
+}
+```
+Will output:
+```css
+/* In critical.css */
+.foo {
+  border: 3px solid gray;
+  display: flex;
+  padding: 1em;
+}
+```
+
+### Using the `@critical` atRule with a custom file path
+
+```css
+/* In foo.css */
+@critical bar;
+
+.foo {
+  border: 3px solid gray;
+  display: flex;
+  padding: 1em;
+}
+```
+Will output:
+```css
+/* In bar.css */
+.foo {
+  border: 3px solid gray;
+  display: flex;
+  padding: 1em;
+}
+```
+
+### Using the `@critical` atRule with a subset of styles
+
+```css
+/* In foo.css */
+.foo {
+  border: 3px solid gray;
+  display: flex;
+  padding: 1em;
+}
+
+@critical {
+  .bar {
+    border: 10px solid gold;
+    color: gold;
+  }
+}
+```
+Will output:
+```css
+/* In bar.css */
+.bar {
+  border: 10px solid gold;
+  color: gold;
+}
+```
+
+### Using the custom property, `critical-selector`
 
 ```css
 /* In foo.css */
@@ -27,13 +101,12 @@ Will output:
 }
 ```
 
-Note that in the above example, the selector is rendered as it is written in the
-module. This may not be desireable, so you can alternatively identify the
-selector you'd like to use in your `critical.css`;
+### Using the custom property, `critical-selector`, with a custom selector.
+
 ```css
 /* In foo.css */
 .foo {
-  critical-selector: .custom-selector;
+  critical-selector: .bar;
   border: 3px solid gray;
   display: flex;
   padding: 1em;
@@ -42,14 +115,39 @@ selector you'd like to use in your `critical.css`;
 Will output:
 ```css
 /* In critical.css */
-.custom-selector {
+.bar {
   border: 3px solid gray;
   display: flex;
   padding: 1em;
 }
 ```
 
-If you'd like to ouptut the entire scope of a module, including children, you can!
+### Using the custom property, `critical-filename`
+
+```css
+/* in foo.css */
+.foo {
+  critical-selector: this;
+  critical-filename: secondary-critical.css;
+  border: 3px solid gray;
+  display: flex;
+  padding: 1em;
+}
+```
+Will output:
+```css
+/* In secondary-critical.css */
+.foo {
+  border: 3px solid gray;
+  display: flex;
+  padding: 1em;
+}
+```
+
+### Using the custom property, `critical-selector`, with value `scope`
+
+This allows the user to output the entire scope of a module, including children.
+
 ```css
 /* in foo.css */
 .foo {
@@ -79,47 +177,17 @@ Will output:
 }
 ```
 
-And what if you need to output multiple critical CSS files
-(for example, if you have two different templates that do not share styles)?
-You can do that as well.
-```css
-/* in foo.css */
-.foo {
-  critical-selector: this;
-  critical-filename: secondary-critical.css;
-  border: 3px solid gray;
-  display: flex;
-  padding: 1em;
-}
-```
-Will output:
-```css
-/* In secondary-critical.css */
-.foo {
-  border: 3px solid gray;
-  display: flex;
-  padding: 1em;
-}
-```
+## Plugin options
 
-## Options
+The plugin takes a single object as its only parameter. The following properties are valid:
 
-**outputPath**
-Path to which critical CSS should be output
-Default: current working directory
-
-**preserve**
-Whether or not to remove selectors from primary CSS document once they've been marked as critical.
-This should prevent duplication of selectors across critical and non-critical CSS.
-WARNING: this is a destructive option and may break styles relying on the cascade!
-Default: true
-
-**minify**
-Minify output CSS
-Default: true
+| Arg          | Type      | Description                                 | Default |
+| ------------ | --------- | ------------------------------------------- | ------------------------- |
+| `outputPath` | `string`  | Path to which critical CSS should be output | Current working directory |
+| `preserve`   | `boolean` | Whether or not to remove selectors from primary CSS document once they've been marked as critical. This should prevent duplication of selectors across critical and non-critical CSS. | `true` |
+| `minify`     | `boolean` | Minify output CSS? | `true` |
 
 ## To Dos
 
-- Tests
 - More tests
 - More robust warnings

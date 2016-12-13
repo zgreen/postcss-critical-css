@@ -7,38 +7,14 @@ var postcssCriticalCSS = require('..');
 const basePath = `${process.cwd()}/test/fixtures`;
 const chalk = require('chalk');
 
-function fixturePath(name) {
-  return 'test/fixtures/' + name + '.css';
-}
-
-function fixture(name) {
-  return fs.readFileSync(fixturePath(name), 'utf8').trim();
-}
-
-function resolveFixture(name, options) {
-  return postcss(postcssCriticalCSS(options))
-    .process(fixture(name), {from: fixturePath(name)});
-}
-
-function compareFixtures(t, name, options) {
-  var postcssResult = resolveFixture(name, options);
-  var actual = postcssResult.css.trim();
-
-  fs.writeFile(fixturePath(name + '.actual'), actual);
-
-  var expected = fixture(name + '.expected');
+function compareCritical(t, name, testNonCritical) {
   t.equal(
-    actual, expected,
-    'processed fixture ' + chalk.bold(name) + ' should be equal to expected output'
-  );
-
-  return postcssResult;
-}
-
-function compareCritical(t, name) {
-  t.equal(
-    fs.readFileSync(`${basePath}/${name}.critical.actual.css`, 'utf8').trim(),
-    fs.readFileSync(`${basePath}/${name}.critical.expected.css`, 'utf8').trim(),
+    fs.readFileSync(
+`${basePath}/${name}.${testNonCritical ? 'non-critical.actual' : 'critical.actual'}.css`, 'utf8'
+    ).trim(),
+    fs.readFileSync(
+`${basePath}/${name}.${testNonCritical ? 'non-critical.expected' : 'critical.expected'}.css`, 'utf8'
+    ).trim(),
     `processed fixture ${chalk.bold(name)} should be equal to expected output`
   );
 }
@@ -49,6 +25,46 @@ test('Testing "this" critical result', function(t) {
 });
 
 test('Testing "this" non-critical result', function(t) {
-  compareFixtures(t, 'this');
+  compareCritical(t, 'this', true);
+  t.end();
+});
+
+test('Testing "atRule" critical result', function(t) {
+  compareCritical(t, 'atRule');
+  t.end();
+});
+
+test('Testing "atRule" non-critical result', function(t) {
+  compareCritical(t, 'atRule', true);
+  t.end();
+});
+
+test(chalk.yellow(`Testing ${chalk.bold('atRule.wrapping')} critical result`), function(t) {
+  compareCritical(t, 'atRule-wrapping');
+  t.end();
+});
+
+test(chalk.yellow(`Testing ${chalk.bold('atRule.wrapping')} non-critical result`), function(t) {
+  compareCritical(t, 'atRule-wrapping', true);
+  t.end();
+});
+
+test('Testing "media" critical result', function(t) {
+  compareCritical(t, 'media');
+  t.end();
+});
+
+test('Testing "media" non-critical result', function(t) {
+  compareCritical(t, 'media', true);
+  t.end();
+});
+
+test(chalk.yellow(`Testing ${chalk.bold('scope')} critical result`), function(t) {
+  compareCritical(t, 'scope');
+  t.end();
+});
+
+test(chalk.yellow(`Testing ${chalk.bold('scope')} non-critical result`), function(t) {
+  compareCritical(t, 'scope', true);
   t.end();
 });
