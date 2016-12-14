@@ -8,12 +8,14 @@ import { getCriticalDestination } from './getCriticalDestination'
  * Identify critical CSS selectors
  *
  * @param {object} PostCSS CSS object.
+ * @param {boolean} Whether or not to remove selectors from primary CSS document.
+ * @param {string} Default output CSS file name.
  * @return {object} Object containing critical rules, organized by output destination
  */
-export function getCriticalRules (css: Object, shouldPreserve: boolean): Object {
+export function getCriticalRules (css: Object, shouldPreserve: boolean, defaultDest: String): Object {
   const critical = getCriticalFromAtRule({ css })
   css.walkDecls('critical-selector', (decl: Object) => {
-    const dest = getCriticalDestination(decl.parent)
+    const dest = getCriticalDestination(decl.parent, defaultDest)
     const container = decl.parent.parent.type === 'atrule'
       ? decl.parent.parent
       : decl.parent
