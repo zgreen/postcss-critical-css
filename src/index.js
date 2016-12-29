@@ -40,7 +40,12 @@ function buildCritical (options: ArgsType): Function {
           if (!args.dryRun) {
             fs.writeFile(
               path.join(args.outputPath, cur),
-              result.css
+              result.css,
+              (err) => {
+                if (err) {
+                  throw new Error(err)
+                }
+              }
             )
           } else {
             console.log( // eslint-disable-line no-console
