@@ -8,11 +8,21 @@ function cb (files) {
   function useFileData (data, file) {
     postcss([postcssCriticalCSS({outputPath: basePath})])
       .process(data)
-      .then(result => fs.writeFile(`${basePath}/${file.split('.')[0]}.non-critical.actual.css`, result.css))
+      .then(result => fs.writeFile(
+        `${basePath}/${file.split('.')[0]}.non-critical.actual.css`,
+        result.css,
+        'utf8',
+        (err) => {
+          if (err) {
+            throw new Error(err)
+          }
+        }))
   }
   files.forEach(function (file) {
     if (file.indexOf('.actual') !== -1) {
-      fs.unlink(`${basePath}/${file}`)
+      fs.unlink(`${basePath}/${file}`, (err) => {
+        if (err) { throw new Error(err) }
+      })
     }
     if (file.indexOf('.expected') === -1 && file.indexOf('.actual') === -1) {
       fs.readFile(`${basePath}/${file}`, 'utf8', (err, data) => {
