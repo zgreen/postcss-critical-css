@@ -1,17 +1,16 @@
 #!/usr/bin/env node
-var fs = require('fs')
-var test = require('tape')
-var postcss = require('postcss')
-var postcssCriticalCSS = require('..');
+const fs = require('fs')
+const postcss = require('postcss')
+const postcssCriticalCSS = require('..')
+const basePath = `${process.cwd()}/test/fixtures`
 
-const basePath = `${process.cwd()}/test/fixtures`;
 function cb (files) {
   function useFileData (data, file) {
     postcss([postcssCriticalCSS({outputPath: basePath})])
       .process(data)
       .then(result => fs.writeFile(`${basePath}/${file.split('.')[0]}.non-critical.actual.css`, result.css))
   }
-  files.forEach(function(file) {
+  files.forEach(function (file) {
     if (file.indexOf('.actual') !== -1) {
       fs.unlink(`${basePath}/${file}`)
     }
