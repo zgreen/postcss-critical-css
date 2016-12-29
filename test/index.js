@@ -17,52 +17,52 @@ function compareCritical (t, name, testNonCritical) {
   )
 }
 
-test('Testing "this" critical result', function (t) {
+test('Testing "this" critical result', (t) => {
   compareCritical(t, 'this')
   t.end()
 })
 
-test('Testing "this" non-critical result', function (t) {
+test('Testing "this" non-critical result', (t) => {
   compareCritical(t, 'this', true)
   t.end()
 })
 
-test('Testing "atRule" critical result', function (t) {
+test('Testing "atRule" critical result', (t) => {
   compareCritical(t, 'atRule')
   t.end()
 })
 
-test('Testing "atRule" non-critical result', function (t) {
+test('Testing "atRule" non-critical result', (t) => {
   compareCritical(t, 'atRule', true)
   t.end()
 })
 
-test(chalk.yellow(`Testing ${chalk.bold('atRule.wrapping')} critical result`), function (t) {
+test(chalk.yellow(`Testing ${chalk.bold('atRule.wrapping')} critical result`), (t) => {
   compareCritical(t, 'atRule-wrapping')
   t.end()
 })
 
-test(chalk.yellow(`Testing ${chalk.bold('atRule.wrapping')} non-critical result`), function (t) {
+test(chalk.yellow(`Testing ${chalk.bold('atRule.wrapping')} non-critical result`), (t) => {
   compareCritical(t, 'atRule-wrapping', true)
   t.end()
 })
 
-test('Testing "media" critical result', function (t) {
+test('Testing "media" critical result', (t) => {
   compareCritical(t, 'media')
   t.end()
 })
 
-test('Testing "media" non-critical result', function (t) {
+test('Testing "media" non-critical result', (t) => {
   compareCritical(t, 'media', true)
   t.end()
 })
 
-test(chalk.yellow(`Testing ${chalk.bold('scope')} critical result`), function (t) {
+test(chalk.yellow(`Testing ${chalk.bold('scope')} critical result`), (t) => {
   compareCritical(t, 'scope')
   t.end()
 })
 
-test(chalk.yellow(`Testing ${chalk.bold('scope')} non-critical result`), function (t) {
+test(chalk.yellow(`Testing ${chalk.bold('scope')} non-critical result`), (t) => {
   compareCritical(t, 'scope', true)
   t.end()
 })
