@@ -23,13 +23,14 @@ type ArgsType = {
 function buildCritical (options: ArgsType): Function {
   const args = {
     outputPath: process.cwd(),
+    outputDest: 'critical.css',
     preserve: true,
     minify: true,
     dryRun: false,
     ...options
   }
   return (css: Object): Object => {
-    let criticalOutput = getCriticalRules(css, args.preserve)
+    let criticalOutput = getCriticalRules(css, args.preserve, args.outputDest)
     return Object.keys(criticalOutput).reduce((init: Object, cur: string): Object => {
       const criticalCSS = postcss.root()
       criticalCSS.append(criticalOutput[cur])

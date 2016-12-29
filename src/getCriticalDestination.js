@@ -4,10 +4,10 @@
  * Identify critical CSS destinations.
  *
  * @param {object} rule PostCSS rule.
+ * @param {string} Default output CSS file name.
  * @return {string} String corresponding to output destination.
  */
-export function getCriticalDestination (rule: Object): string {
-  let dest: string = 'critical.css'
+export function getCriticalDestination (rule: Object, dest: String): string {
   rule.walkDecls('critical-filename', (decl: Object) => {
     dest = decl.value.replace(/['"]*/g, '')
     decl.remove()
