@@ -6,9 +6,12 @@ const basePath = `${process.cwd()}/test/fixtures`
 const chalk = require('chalk')
 
 function compareCritical (t, name, testNonCritical) {
+  const actualFilename = -1 !== name.indexOf('default') && !testNonCritical
+    ? 'critical'
+    : `${name}.${testNonCritical ? 'non-critical.actual' : 'critical.actual'}`
   t.equal(
     fs.readFileSync(
-`${basePath}/${name}.${testNonCritical ? 'non-critical.actual' : 'critical.actual'}.css`, 'utf8'
+`${basePath}/${actualFilename}.css`, 'utf8'
     ).trim(),
     fs.readFileSync(
 `${basePath}/${name}.${testNonCritical ? 'non-critical.expected' : 'critical.expected'}.css`, 'utf8'
@@ -16,6 +19,16 @@ function compareCritical (t, name, testNonCritical) {
     `processed fixture ${chalk.bold(name)} should be equal to expected output`
   )
 }
+
+test('Testing default critical result', (t) => {
+  compareCritical(t, 'default')
+  t.end()
+})
+
+test('Testing default non-critical result', (t) => {
+  compareCritical(t, 'default', true)
+  t.end()
+})
 
 test('Testing "this" critical result', (t) => {
   compareCritical(t, 'this')

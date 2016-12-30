@@ -19,18 +19,21 @@ function cb (files) {
         }))
   }
   files.forEach(function (file) {
-    if (file.indexOf('.actual') !== -1) {
-      fs.unlink(`${basePath}/${file}`, (err) => {
-        if (err) { throw new Error(err) }
-      })
-    }
-    if (file.indexOf('.expected') === -1 && file.indexOf('.actual') === -1) {
-      fs.readFile(`${basePath}/${file}`, 'utf8', (err, data) => {
-        if (err) {
-          throw new Error(err)
-        }
-        useFileData(data, file)
-      })
+    // Ignore any critical.css file(s) already written
+    if (file !== 'critical.css') {
+      if (file.indexOf('.actual') !== -1) {
+        fs.unlink(`${basePath}/${file}`, (err) => {
+          if (err) { throw new Error(err) }
+        })
+      }
+      if (file.indexOf('.expected') === -1 && file.indexOf('.actual') === -1) {
+        fs.readFile(`${basePath}/${file}`, 'utf8', (err, data) => {
+          if (err) {
+            throw new Error(err)
+          }
+          useFileData(data, file)
+        })
+      }
     }
   })
 }
