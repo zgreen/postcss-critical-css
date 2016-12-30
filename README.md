@@ -1,5 +1,7 @@
 # PostCSS Critical CSS
 
+![Travis build status](https://travis-ci.org/zgreen/postcss-critical-css.svg?branch=master)
+
 This plugin allows the user to define and output critical CSS using custom atRules, and/or custom CSS properties. Critical CSS may be output to one or more files, as defined within the plugin options or within the CSS.
 
 ## Install

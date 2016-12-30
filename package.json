@@ -1,6 +1,6 @@
 {
   "name": "postcss-critical-css",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "Generate critical CSS using PostCSS",
   "main": "index.js",
   "repository": {
@@ -45,7 +45,7 @@
     "eslint": "eslint test/**/*.js && eslint src/**",
     "start": "eslint src/** && npm run flow && babel src/index.js --out-file index.js --watch",
     "pretest": "./node_modules/.bin/babel-node test/preTest.js",
-    "test": "npm run pretest && tape test"
+    "test": "npm run build && npm run pretest && tape test"
   },
   "dependencies": {
     "chalk": "^1.1.3",
