@@ -7,6 +7,8 @@ import fs from 'fs'
 import path from 'path'
 import { getCriticalRules } from './getCriticalRules'
 
+const broken =
+
 /**
  * Primary plugin function.
  *
