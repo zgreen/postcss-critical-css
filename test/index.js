@@ -1,70 +1,81 @@
 #!/usr/bin/env node
 
-var fs = require('fs')
-var test = require('tape')
-var postcss = require('postcss')
-var postcssCriticalCSS = require('..');
-const basePath = `${process.cwd()}/test/fixtures`;
-const chalk = require('chalk');
+const fs = require('fs')
+const test = require('tape')
+const basePath = `${process.cwd()}/test/fixtures`
+const chalk = require('chalk')
 
-function compareCritical(t, name, testNonCritical) {
+function compareCritical (t, name, testNonCritical) {
+  const actualFilename = name.indexOf('default') !== -1 && !testNonCritical
+    ? 'critical'
+    : `${name}.${testNonCritical ? 'non-critical.actual' : 'critical.actual'}`
   t.equal(
     fs.readFileSync(
-`${basePath}/${name}.${testNonCritical ? 'non-critical.actual' : 'critical.actual'}.css`, 'utf8'
+`${basePath}/${actualFilename}.css`, 'utf8'
     ).trim(),
     fs.readFileSync(
 `${basePath}/${name}.${testNonCritical ? 'non-critical.expected' : 'critical.expected'}.css`, 'utf8'
     ).trim(),
     `processed fixture ${chalk.bold(name)} should be equal to expected output`
-  );
+  )
 }
 
-test('Testing "this" critical result', function(t) {
-  compareCritical(t, 'this');
-  t.end();
-});
+test('Testing default critical result', (t) => {
+  compareCritical(t, 'default')
+  t.end()
+})
 
-test('Testing "this" non-critical result', function(t) {
-  compareCritical(t, 'this', true);
-  t.end();
-});
+test('Testing default non-critical result', (t) => {
+  compareCritical(t, 'default', true)
+  t.end()
+})
 
-test('Testing "atRule" critical result', function(t) {
-  compareCritical(t, 'atRule');
-  t.end();
-});
+test('Testing "this" critical result', (t) => {
+  compareCritical(t, 'this')
+  t.end()
+})
 
-test('Testing "atRule" non-critical result', function(t) {
-  compareCritical(t, 'atRule', true);
-  t.end();
-});
+test('Testing "this" non-critical result', (t) => {
+  compareCritical(t, 'this', true)
+  t.end()
+})
 
-test(chalk.yellow(`Testing ${chalk.bold('atRule.wrapping')} critical result`), function(t) {
-  compareCritical(t, 'atRule-wrapping');
-  t.end();
-});
+test('Testing "atRule" critical result', (t) => {
+  compareCritical(t, 'atRule')
+  t.end()
+})
 
-test(chalk.yellow(`Testing ${chalk.bold('atRule.wrapping')} non-critical result`), function(t) {
-  compareCritical(t, 'atRule-wrapping', true);
-  t.end();
-});
+test('Testing "atRule" non-critical result', (t) => {
+  compareCritical(t, 'atRule', true)
+  t.end()
+})
 
-test('Testing "media" critical result', function(t) {
-  compareCritical(t, 'media');
-  t.end();
-});
+test(chalk.yellow(`Testing ${chalk.bold('atRule.wrapping')} critical result`), (t) => {
+  compareCritical(t, 'atRule-wrapping')
+  t.end()
+})
 
-test('Testing "media" non-critical result', function(t) {
-  compareCritical(t, 'media', true);
-  t.end();
-});
+test(chalk.yellow(`Testing ${chalk.bold('atRule.wrapping')} non-critical result`), (t) => {
+  compareCritical(t, 'atRule-wrapping', true)
+  t.end()
+})
 
-test(chalk.yellow(`Testing ${chalk.bold('scope')} critical result`), function(t) {
-  compareCritical(t, 'scope');
-  t.end();
-});
+test('Testing "media" critical result', (t) => {
+  compareCritical(t, 'media')
+  t.end()
+})
 
-test(chalk.yellow(`Testing ${chalk.bold('scope')} non-critical result`), function(t) {
-  compareCritical(t, 'scope', true);
-  t.end();
-});
+test('Testing "media" non-critical result', (t) => {
+  compareCritical(t, 'media', true)
+  t.end()
+})
+
+test(chalk.yellow(`Testing ${chalk.bold('scope')} critical result`), (t) => {
+  compareCritical(t, 'scope')
+  t.end()
+})
+
+test(chalk.yellow(`Testing ${chalk.bold('scope')} non-critical result`), (t) => {
+  compareCritical(t, 'scope', true)
+  t.end()
+})

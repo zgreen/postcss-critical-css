@@ -12,7 +12,7 @@ import { getCriticalDestination } from './getCriticalDestination'
  * @param {string} Default output CSS file name.
  * @return {object} Object containing critical rules, organized by output destination
  */
-export function getCriticalRules (css: Object, shouldPreserve: boolean, defaultDest: String): Object {
+export function getCriticalRules (css: Object, shouldPreserve: boolean, defaultDest: string): Object {
   const critical = getCriticalFromAtRule({ css })
   css.walkDecls('critical-selector', (decl: Object) => {
     const dest = getCriticalDestination(decl.parent, defaultDest)
