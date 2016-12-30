@@ -6,7 +6,7 @@ const basePath = `${process.cwd()}/test/fixtures`
 const chalk = require('chalk')
 
 function compareCritical (t, name, testNonCritical) {
-  const actualFilename = -1 !== name.indexOf('default') && !testNonCritical
+  const actualFilename = name.indexOf('default') !== -1 && !testNonCritical
     ? 'critical'
     : `${name}.${testNonCritical ? 'non-critical.actual' : 'critical.actual'}`
   t.equal(
