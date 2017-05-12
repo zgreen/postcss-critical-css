@@ -1,8 +1,26 @@
 // @flow
 
-import { getChildRules } from './getChildRules'
-import { getCriticalFromAtRule } from './atRule'
-import { getCriticalDestination } from './getCriticalDestination'
+import postcss from 'postcss'
+import {getChildRules} from './getChildRules'
+import {getCriticalFromAtRule} from './atRule'
+import {getCriticalDestination} from './getCriticalDestination'
+import {magenta, yellow} from 'chalk'
+
+// function getFirstAvailableLineNumber (rule: Object) {
+//   return rule.nodes.reduce((acc, r) => {
+//     return acc.source ? acc.source.start.line : acc[0].nodes
+//   })
+// }
+
+function appendCritical (root, update) {
+  update.clone().each(rule => {
+    console.log(yellow.bold(JSON.stringify(rule)))
+    if (rule.prop !== 'critical-selector') {
+      root.append(rule)
+    }
+  })
+  return root
+}
 
 /**
  * Identify critical CSS selectors
@@ -12,47 +30,57 @@ import { getCriticalDestination } from './getCriticalDestination'
  * @param {string} Default output CSS file name.
  * @return {object} Object containing critical rules, organized by output destination
  */
-export function getCriticalRules (css: Object, shouldPreserve: boolean, defaultDest: string): Object {
-  const critical = getCriticalFromAtRule({ css })
+export function getCriticalRules (
+  css: Object,
+  shouldPreserve: boolean,
+  defaultDest: string
+) {
+  const critical: Object = getCriticalFromAtRule({css})
   css.walkDecls('critical-selector', (decl: Object) => {
-    const dest = getCriticalDestination(decl.parent, defaultDest)
-    const container = decl.parent.parent.type === 'atrule'
-      ? decl.parent.parent
-      : decl.parent
-    const childRules = decl.value === 'scope'
-      ? getChildRules(css, decl.parent, shouldPreserve)
+    const {parent, value} = decl
+    const dest = getCriticalDestination(parent, defaultDest)
+    const container = parent
+    const childRules = value === 'scope'
+      ? getChildRules(css, parent, shouldPreserve)
       : []
-    if (typeof critical[dest] === 'undefined') {
-      critical[dest] = []
-    }
+    critical[dest] = typeof critical[dest] === 'undefined'
+      ? postcss.root()
+      : critical[dest]
 
-    switch (decl.value) {
+    switch (value) {
       case 'scope':
         // Make sure the parent selector contains declarations
-        if (decl.parent.nodes.length > 1) {
-          critical[dest].push(container)
+        if (parent.nodes.length > 1) {
+          critical[dest].append(container.clone())
         }
 
         // Add all child rules
         if (childRules !== null && childRules.length) {
-          critical[dest] = critical[dest].concat(childRules)
+          critical[dest] = childRules.reduce((acc, rule) => {
+            return acc.append(rule.clone())
+          }, postcss.root())
         }
         // Ensure source ordering is correct.
-        critical[dest] = critical[dest]
-          .sort((a: Object, b: Object) => a.source.start.line - b.source.start.line)
+        // critical[dest] = critical[dest].sort((a: Object, b: Object) => {
+        //   const first = getFirstAvailableLineNumber(a)
+        //   const second = getFirstAvailableLineNumber(b)
+        //   return first - second
+        // })
         break
 
       case 'this':
-        critical[dest].push(container)
+        console.log(magenta.bold(JSON.stringify(container, null, 2)))
+        appendCritical(critical[dest], container)
+        // critical[dest].append(container.clone())
         break
 
       default:
-        container.selector = decl.value.replace(/['"]*/g, '')
-        critical[dest].push(container)
+        container.selector = value.replace(/['"]*/g, '')
+        critical[dest].append(container.clone())
         break
     }
 
     decl.remove()
   })
-  return critical
+  return new Promise(resolve => resolve(critical))
 }

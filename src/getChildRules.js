@@ -1,7 +1,7 @@
 // @flow
 
 import postcss from 'postcss'
-import { matchChild } from './matchChild'
+import {matchChild} from './matchChild'
 
 /**
  * Get rules for selectors nested within parent node
@@ -13,7 +13,8 @@ import { matchChild } from './matchChild'
 export function getChildRules (
   css: Object,
   parent: Object,
-  shouldPreserve: boolean): Array<Object> {
+  shouldPreserve: boolean
+): Array<Object> {
   const result = []
   const selectorRegExp: Object = new RegExp(parent.selector)
 
@@ -36,7 +37,8 @@ export function getChildRules (
       })
       // Should append even if parent selector
       if (rule.selector === parent.selector || childRule) {
-        criticalAtRule.append(rule)
+        const clone = rule.clone()
+        criticalAtRule.append(clone)
         result.push(criticalAtRule)
         if (!shouldPreserve) {
           rule.remove()

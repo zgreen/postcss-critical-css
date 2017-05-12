@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+const {cyan} = require('chalk')
 const fs = require('fs')
 const test = require('tape')
 const basePath = `${process.cwd()}/test/fixtures`
@@ -10,6 +11,7 @@ function compareCritical (t, name, testNonCritical) {
   const actualFilename = name.indexOf('default') !== -1 && !testNonCritical
     ? 'critical'
     : `${name}.${testNonCritical ? 'non-critical.actual' : 'critical.actual'}`
+  console.log(cyan.bold(actualFilename))
   t.equal(
     fs.readFileSync(`${basePath}/${actualFilename}.css`, 'utf8').trim(),
     fs
@@ -20,6 +22,7 @@ function compareCritical (t, name, testNonCritical) {
       .trim(),
     `processed fixture ${chalk.bold(name)} should be equal to expected output`
   )
+  t.end()
 }
 
 function initTests (key) {
@@ -27,36 +30,30 @@ function initTests (key) {
     default: () => {
       test('Testing default critical result', t => {
         compareCritical(t, 'default')
-        t.end()
       })
 
       test('Testing default non-critical result', t => {
         compareCritical(t, 'default', true)
-        t.end()
       })
     },
 
     this: () => {
       test('Testing "this" critical result', t => {
         compareCritical(t, 'this')
-        t.end()
       })
 
       test('Testing "this" non-critical result', t => {
         compareCritical(t, 'this', true)
-        t.end()
       })
     },
 
-    atRuleCritical: () => {
+    atRule: () => {
       test('Testing "atRule" critical result', t => {
         compareCritical(t, 'atRule')
-        t.end()
       })
 
       test('Testing "atRule" non-critical result', t => {
         compareCritical(t, 'atRule', true)
-        t.end()
       })
     },
 
@@ -67,7 +64,6 @@ function initTests (key) {
         ),
         t => {
           compareCritical(t, 'atRule-wrapping')
-          t.end()
         }
       )
 
@@ -77,7 +73,6 @@ function initTests (key) {
         ),
         t => {
           compareCritical(t, 'atRule-wrapping', true)
-          t.end()
         }
       )
     },
@@ -85,12 +80,10 @@ function initTests (key) {
     media: () => {
       test('Testing "media" critical result', t => {
         compareCritical(t, 'media')
-        t.end()
       })
 
       test('Testing "media" non-critical result', t => {
         compareCritical(t, 'media', true)
-        t.end()
       })
     },
 
@@ -99,7 +92,6 @@ function initTests (key) {
         chalk.yellow(`Testing ${chalk.bold('scope')} critical result`),
         t => {
           compareCritical(t, 'scope')
-          t.end()
         }
       )
 
@@ -107,7 +99,6 @@ function initTests (key) {
         chalk.yellow(`Testing ${chalk.bold('scope')} non-critical result`),
         t => {
           compareCritical(t, 'scope', true)
-          t.end()
         }
       )
     },
@@ -117,7 +108,6 @@ function initTests (key) {
         chalk.yellow(`Testing ${chalk.bold('media-scope')} critical result`),
         t => {
           compareCritical(t, 'media-scope', true)
-          t.end()
         }
       )
 
@@ -127,7 +117,6 @@ function initTests (key) {
         ),
         t => {
           compareCritical(t, 'media-scope', true)
-          t.end()
         }
       )
     }

@@ -194,3 +194,4 @@ The plugin takes a single object as its only parameter. The following properties
 
 - More tests
 - More robust warnings
+- Plugin options not getting passed correctly

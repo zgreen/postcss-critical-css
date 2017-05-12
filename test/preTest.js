@@ -1,30 +1,31 @@
 #!/usr/bin/env node
 const fs = require('fs')
-const postcss = require('postcss')
+const {bold, red} = require('chalk')
 const postcssCriticalCSS = require('..')
 const basePath = `${process.cwd()}/test/fixtures`
 
-function cb (files) {
-  function useFileData (data, file) {
-    postcss([postcssCriticalCSS({outputPath: basePath})])
-      .process(data)
-      .catch(err => {
-        console.error(err)
-        process.exit(1)
-      })
-      .then(result =>
-        fs.writeFile(
-          `${basePath}/${file.split('.')[0]}.non-critical.actual.css`,
-          result.css,
-          'utf8',
-          err => {
-            if (err) {
-              throw new Error(err)
-            }
+function useFileData (data, file) {
+  postcssCriticalCSS
+    .process(data, {}, {outputPath: basePath})
+    .catch(err => {
+      console.error(bold.red('Error: '), err)
+      process.exit(1)
+    })
+    .then(result =>
+      fs.writeFile(
+        `${basePath}/${file.split('.')[0]}.non-critical.actual.css`,
+        result.css,
+        'utf8',
+        err => {
+          if (err) {
+            throw new Error(err)
           }
-        )
+        }
       )
-  }
+    )
+}
+
+function cb (files) {
   files.forEach(function (file) {
     // Ignore any critical.css file(s) already written
     if (file !== 'critical.css') {

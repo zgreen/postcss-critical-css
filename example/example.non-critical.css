@@ -1,3 +1,5 @@
+@critical;
+
 .foo {
   display: flex;
   width: calc(100% - 200px);
