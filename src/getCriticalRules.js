@@ -4,7 +4,6 @@ import postcss from 'postcss'
 import {getChildRules} from './getChildRules'
 import {getCriticalFromAtRule} from './atRule'
 import {getCriticalDestination} from './getCriticalDestination'
-import {magenta, yellow} from 'chalk'
 
 // function getFirstAvailableLineNumber (rule: Object) {
 //   return rule.nodes.reduce((acc, r) => {
@@ -14,10 +13,19 @@ import {magenta, yellow} from 'chalk'
 
 function appendCritical (root, update) {
   update.clone().each(rule => {
-    console.log(yellow.bold(JSON.stringify(rule)))
-    if (rule.prop !== 'critical-selector') {
-      root.append(rule)
-    }
+    let result = rule.root()
+    root.append(
+      Object.keys(result).reduce((acc, key) => {
+        if (key === 'nodes') {
+          acc.nodes = result.nodes.filter(
+            node => node.prop !== 'critical-selector'
+          )
+        } else {
+          acc[key] = result[key]
+        }
+        return acc
+      }, {})
+    )
   })
   return root
 }
@@ -69,7 +77,6 @@ export function getCriticalRules (
         break
 
       case 'this':
-        console.log(magenta.bold(JSON.stringify(container, null, 2)))
         appendCritical(critical[dest], container)
         // critical[dest].append(container.clone())
         break
