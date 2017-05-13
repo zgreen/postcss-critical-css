@@ -1,9 +1,9 @@
 // @flow
 
 import postcss from 'postcss'
-import {getChildRules} from './getChildRules'
-import {getCriticalFromAtRule} from './atRule'
-import {getCriticalDestination} from './getCriticalDestination'
+import { getChildRules } from './getChildRules'
+import { getCriticalFromAtRule } from './atRule'
+import { getCriticalDestination } from './getCriticalDestination'
 
 // function getFirstAvailableLineNumber (rule: Object) {
 //   return rule.nodes.reduce((acc, r) => {
@@ -14,6 +14,7 @@ import {getCriticalDestination} from './getCriticalDestination'
 function appendCritical (root, update) {
   update.clone().each(rule => {
     let result = rule.root()
+
     root.append(
       Object.keys(result).reduce((acc, key) => {
         if (key === 'nodes') {
@@ -43,11 +44,21 @@ export function getCriticalRules (
   shouldPreserve: boolean,
   defaultDest: string
 ) {
-  const critical: Object = getCriticalFromAtRule({css})
+  const critical: Object = getCriticalFromAtRule({ css })
   css.walkDecls('critical-selector', (decl: Object) => {
-    const {parent, value} = decl
+    const { parent, value } = decl
     const dest = getCriticalDestination(parent, defaultDest)
-    const container = parent
+    const container = parent.parent.type === 'atrule' &&
+      parent.parent.name === 'media'
+      ? appendCritical(
+          postcss.root().append({
+            name: 'media',
+            type: 'atrule',
+            params: parent.parent.params
+          }).nodes[0],
+          parent
+        )
+      : parent
     const childRules = value === 'scope'
       ? getChildRules(css, parent, shouldPreserve)
       : []
