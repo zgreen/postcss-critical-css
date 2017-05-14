@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const {cyan} = require('chalk')
+const { cyan } = require('chalk')
 const fs = require('fs')
 const test = require('tape')
 const basePath = `${process.cwd()}/test/fixtures`
@@ -107,7 +107,7 @@ function initTests (key) {
       test(
         chalk.yellow(`Testing ${chalk.bold('media-scope')} critical result`),
         t => {
-          compareCritical(t, 'media-scope', true)
+          compareCritical(t, 'media-scope')
         }
       )
 

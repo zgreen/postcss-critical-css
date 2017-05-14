@@ -5,23 +5,22 @@ import { getChildRules } from './getChildRules'
 import { getCriticalFromAtRule } from './atRule'
 import { getCriticalDestination } from './getCriticalDestination'
 
-// function getFirstAvailableLineNumber (rule: Object) {
-//   // return rule.nodes.reduce((acc, r) => {
-//   //   console.log(acc, )
-//   //   return acc.source ? acc.source.start.line : acc[0].nodes
-//   // }, [])
-//   console.log(
-//     rule.nodes.find(node => (node.source ? node : node.nodes[0])).source.start
-//       .line
-//   )
-//   return rule.nodes.find(node => (node.source ? node : node.nodes[0])).source
-//     .start.line
+// function shouldPrepend (root, next) {
+//   let result = true
+//   if (root.last && next.source) {
+//     result =
+//       (root.last.type === 'atrule'
+//         ? root.last.nodes[0].source.line.start
+//         : root.last.source.line.start) < next.source.line.start
+//   } else if (!next.source) {
+//     result = false
+//   }
+//   return result
 // }
 
 function appendCritical (root, update) {
   update.clone().each(rule => {
     let result = rule.root()
-
     root.append(
       Object.keys(result).reduce((acc, key) => {
         if (key === 'nodes') {
@@ -77,22 +76,20 @@ export function getCriticalRules (
       case 'scope':
         let criticalRoot = critical[dest]
         const sortedRoot = postcss.root()
-        // Make sure the parent selector contains declarations
-        if (parent.nodes.length > 1) {
-          criticalRoot.append(container.clone())
-        }
+        criticalRoot.append(container.clone())
 
         // Add all child rules
         if (childRules !== null && childRules.length) {
           criticalRoot = childRules.reduce((acc, rule) => {
             return acc.append(rule.clone())
-          }, postcss.root().append(container.clone()))
+          }, criticalRoot)
         }
 
         // Ensure source ordering is correct.
         criticalRoot.walkRules((rule, idx) => {
           if (
             idx === 0 ||
+            sortedRoot.nodes.length === 0 ||
             sortedRoot.last.source.line.start < rule.source.line.start
           ) {
             sortedRoot
