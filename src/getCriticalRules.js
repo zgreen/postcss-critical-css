@@ -6,9 +6,16 @@ import { getCriticalFromAtRule } from './atRule'
 import { getCriticalDestination } from './getCriticalDestination'
 
 // function getFirstAvailableLineNumber (rule: Object) {
-//   return rule.nodes.reduce((acc, r) => {
-//     return acc.source ? acc.source.start.line : acc[0].nodes
-//   })
+//   // return rule.nodes.reduce((acc, r) => {
+//   //   console.log(acc, )
+//   //   return acc.source ? acc.source.start.line : acc[0].nodes
+//   // }, [])
+//   console.log(
+//     rule.nodes.find(node => (node.source ? node : node.nodes[0])).source.start
+//       .line
+//   )
+//   return rule.nodes.find(node => (node.source ? node : node.nodes[0])).source
+//     .start.line
 // }
 
 function appendCritical (root, update) {
@@ -68,23 +75,40 @@ export function getCriticalRules (
 
     switch (value) {
       case 'scope':
+        let criticalRoot = critical[dest]
+        const sortedRoot = postcss.root()
         // Make sure the parent selector contains declarations
         if (parent.nodes.length > 1) {
-          critical[dest].append(container.clone())
+          criticalRoot.append(container.clone())
         }
 
         // Add all child rules
         if (childRules !== null && childRules.length) {
-          critical[dest] = childRules.reduce((acc, rule) => {
+          criticalRoot = childRules.reduce((acc, rule) => {
             return acc.append(rule.clone())
-          }, postcss.root())
+          }, postcss.root().append(container.clone()))
         }
+
         // Ensure source ordering is correct.
-        // critical[dest] = critical[dest].sort((a: Object, b: Object) => {
-        //   const first = getFirstAvailableLineNumber(a)
-        //   const second = getFirstAvailableLineNumber(b)
-        //   return first - second
-        // })
+        criticalRoot.walkRules((rule, idx) => {
+          if (
+            idx === 0 ||
+            sortedRoot.last.source.line.start < rule.source.line.start
+          ) {
+            sortedRoot
+              .prepend(rule)
+              .walkDecls('critical-selector', criticalSelector =>
+                criticalSelector.remove()
+              )
+          } else {
+            sortedRoot
+              .append(rule)
+              .walkDecls('critical-selector', criticalSelector =>
+                criticalSelector.remove()
+              )
+          }
+        })
+        critical[dest] = sortedRoot
         break
 
       case 'this':

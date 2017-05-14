@@ -1,7 +1,7 @@
 // @flow
 
 import postcss from 'postcss'
-import {matchChild} from './matchChild'
+import { matchChild } from './matchChild'
 
 /**
  * Get rules for selectors nested within parent node
