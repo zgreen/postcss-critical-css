@@ -73,28 +73,9 @@ export function getCriticalRules (
         }
 
         // Ensure source ordering is correct.
-        // criticalRoot.walkAtRules(rule => {
-        //   if (
-        //     idx === 0 ||
-        //     sortedRoot.nodes.length === 0 ||
-        //     sortedRoot.last.source.line.start < rule.nodes[0].source.line.start
-        //   ) {
-        //     sortedRoot
-        //       .prepend(rule)
-        //   } else {
-        //     sortedRoot
-        //       .append(rule)
-        //
-        //   }
-        // })
-        // criticalRoot.walk(rule => {
-        //   console.log(JSON.stringify(rule, null, 2))
-        // })
-        criticalRoot.walkRules((rule, idx) => {
+        criticalRoot.walkRules((rule: Object) => {
           let start = rule.source.start.line
           if (rule.parent.type === 'atrule') {
-            // console.log(JSON.stringify(rule.source, null, 2))
-            // start = rule.parent.nodes[0].start.line
             const child = rule
             rule = postcss
               .atRule({
@@ -105,15 +86,7 @@ export function getCriticalRules (
             rule.source = child.source
             start = child.source.start.line
           }
-          // console.log(
-          //   postcss.parse(rule).toString(),
-          //   '\n',
-          //   start,
-          //   `\nIndex: ${idx}`,
-          //   JSON.stringify(sortedRoot.last, null, 2)
-          // )
           if (
-            // idx === 0 ||
             sortedRoot.nodes.length === 0 ||
             (sortedRoot.last && sortedRoot.last.source.start.line > start)
           ) {

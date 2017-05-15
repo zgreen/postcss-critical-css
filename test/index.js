@@ -119,6 +119,22 @@ function initTests (key) {
           compareCritical(t, 'media-scope', true)
         }
       )
+    },
+
+    mediaThis: () => {
+      test(
+        chalk.yellow(`Testing ${chalk.bold('media-this')} critical result`),
+        t => {
+          compareCritical(t, 'media-this')
+        }
+      )
+
+      test(
+        chalk.yellow(`Testing ${chalk.bold('media-this')} non-critical result`),
+        t => {
+          compareCritical(t, 'media-this', true)
+        }
+      )
     }
   }
 
