@@ -108,7 +108,6 @@ export function getCriticalRules (
 
       case 'this':
         appendCritical(critical[dest], container)
-        // critical[dest].append(container.clone())
         break
 
       default:

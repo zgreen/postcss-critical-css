@@ -1,18 +1,19 @@
 // @flow
 
-import {red, green, yellow} from 'chalk'
+import { red, green, yellow } from 'chalk'
 import postcss from 'postcss'
 import cssnano from 'cssnano'
 import fs from 'fs'
 import path from 'path'
-import {getCriticalRules} from './getCriticalRules'
+import { getCriticalRules } from './getCriticalRules'
 
-type CriticalBuildArgs = {
-  outputPath: string,
-  preserve: boolean,
-  minify: boolean,
-  dryRun: boolean
-}
+// type CriticalBuildArgs = {
+//   outputDest: string,
+//   outputPath: string,
+//   preserve: boolean,
+//   minify: boolean,
+//   dryRun: boolean
+// }
 
 /**
  * Do a dry run, console.log the output.
@@ -34,8 +35,12 @@ function doDryRun (css: string) {
  * @param {Object} result PostCSS root object.
  * @return {Function} Calls writeCriticalFile or doDryRun
  */
-function dryRunOrWriteFile (dryRun: boolean, filePath: string, result: Object) {
-  const {css} = result
+function dryRunOrWriteFile (
+  dryRun: boolean,
+  filePath: string,
+  result: Object
+): void {
+  const { css } = result
   return dryRun ? doDryRun(css) : writeCriticalFile(filePath, css)
 }
 
@@ -60,7 +65,7 @@ function writeCriticalFile (filePath: string, css: string) {
  * @param {object} array of options.
  * @return {function} function for PostCSS plugin.
  */
-function buildCritical (options: CriticalBuildArgs) {
+function buildCritical (options: Object): Function {
   const args = {
     outputPath: process.cwd(),
     outputDest: 'critical.css',
@@ -70,19 +75,19 @@ function buildCritical (options: CriticalBuildArgs) {
     ...options
   }
   return (css: Object) => {
-    const {dryRun, preserve, minify, outputPath, outputDest} = args
+    const { dryRun, preserve, minify, outputPath, outputDest } = args
     getCriticalRules(css, preserve, outputDest)
-      .catch(err => {
+      .catch((err: string) => {
         console.error(`${red.bold('Error:')} ${err}`)
         process.exit(1)
       })
-      .then(criticalOutput => {
+      .then((criticalOutput: Object): Object => {
         return Object.keys(
           criticalOutput
         ).reduce((init: Object, cur: string): Object => {
           const criticalCSS = postcss.root()
           const filePath = path.join(outputPath, cur)
-          criticalOutput[cur].each(rule => {
+          criticalOutput[cur].each((rule: Object) => {
             criticalCSS.append(rule.clone())
           })
           postcss(minify ? [cssnano] : [])
