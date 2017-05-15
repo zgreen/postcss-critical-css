@@ -123,7 +123,6 @@ export function getCriticalRules (
         break
 
       default:
-        container.selector = value.replace(/['"]*/g, '')
         critical[dest].append(container.clone())
         break
     }
