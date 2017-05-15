@@ -5,30 +5,28 @@ import { getChildRules } from './getChildRules'
 import { getCriticalFromAtRule } from './atRule'
 import { getCriticalDestination } from './getCriticalDestination'
 
+function clean (root, test = 'critical-selector') {
+  const clone = root.clone()
+  clone.walkDecls(test, (decl: Object) => {
+    decl.remove()
+  })
+  return clone
+}
+
 /**
  * Update a critical root.
  *
  * @param {Object} root Root object to update.
  * @param {Object} update Update object.
- * @return {Object} root
+ * @return {Object} clonedRoot Root object.
  */
 function updateCritical (root: Object, update: Object): Object {
+  const clonedRoot = root.clone()
   update.clone().each((rule: Object) => {
     const ruleRoot = rule.root()
-    root.append(
-      Object.keys(ruleRoot).reduce((acc: Object, key: string): Object => {
-        if (key === 'nodes') {
-          acc.nodes = ruleRoot.nodes.filter(
-            (node: Object): boolean => node.prop !== 'critical-selector'
-          )
-        } else {
-          acc[key] = ruleRoot[key]
-        }
-        return acc
-      }, {})
-    )
+    clonedRoot.append(clean(ruleRoot))
   })
-  return root
+  return clonedRoot
 }
 
 /**
@@ -68,8 +66,8 @@ export function getCriticalRules (
 
     switch (value) {
       case 'scope':
-        let criticalRoot = critical[dest]
         const sortedRoot = postcss.root()
+        let criticalRoot = critical[dest]
         criticalRoot.append(container.clone())
 
         // Add all child rules
@@ -100,33 +98,18 @@ export function getCriticalRules (
             sortedRoot.nodes.length === 0 ||
             (sortedRoot.last && sortedRoot.last.source.start.line > start)
           ) {
-            sortedRoot
-              .prepend(rule)
-              .walkDecls(
-                'critical-selector',
-                (criticalSelector: Object): void => criticalSelector.remove()
-              )
+            sortedRoot.prepend(rule)
           } else {
-            sortedRoot
-              .append(rule)
-              .walkDecls(
-                'critical-selector',
-                (criticalSelector: Object): void => criticalSelector.remove()
-              )
+            sortedRoot.append(rule)
           }
         })
-        critical[dest] = sortedRoot
-        break
-
-      case 'this':
-        updateCritical(critical[dest], container)
+        critical[dest] = clean(sortedRoot)
         break
 
       default:
-        critical[dest].append(container.clone())
+        critical[dest] = updateCritical(critical[dest], container)
         break
     }
-
     decl.remove()
   })
   return critical
