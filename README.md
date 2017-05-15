@@ -189,9 +189,3 @@ The plugin takes a single object as its only parameter. The following properties
 | `outputDest` | `string`  | Default critical CSS file name | `"critical.css"` |
 | `preserve`   | `boolean` | Whether or not to remove selectors from primary CSS document once they've been marked as critical. This should prevent duplication of selectors across critical and non-critical CSS. | `true` |
 | `minify`     | `boolean` | Minify output CSS? | `true` |
-
-## To Dos
-
-- More tests
-- More robust warnings
-- Plugin options not getting passed correctly
