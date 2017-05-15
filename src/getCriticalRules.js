@@ -5,19 +5,6 @@ import { getChildRules } from './getChildRules'
 import { getCriticalFromAtRule } from './atRule'
 import { getCriticalDestination } from './getCriticalDestination'
 
-// function shouldPrepend (root, next) {
-//   let result = true
-//   if (root.last && next.source) {
-//     result =
-//       (root.last.type === 'atrule'
-//         ? root.last.nodes[0].source.line.start
-//         : root.last.source.line.start) < next.source.line.start
-//   } else if (!next.source) {
-//     result = false
-//   }
-//   return result
-// }
-
 function appendCritical (root, update) {
   update.clone().each(rule => {
     let result = rule.root()
@@ -86,11 +73,49 @@ export function getCriticalRules (
         }
 
         // Ensure source ordering is correct.
+        // criticalRoot.walkAtRules(rule => {
+        //   if (
+        //     idx === 0 ||
+        //     sortedRoot.nodes.length === 0 ||
+        //     sortedRoot.last.source.line.start < rule.nodes[0].source.line.start
+        //   ) {
+        //     sortedRoot
+        //       .prepend(rule)
+        //   } else {
+        //     sortedRoot
+        //       .append(rule)
+        //
+        //   }
+        // })
+        // criticalRoot.walk(rule => {
+        //   console.log(JSON.stringify(rule, null, 2))
+        // })
         criticalRoot.walkRules((rule, idx) => {
+          let start = rule.source.start.line
+          if (rule.parent.type === 'atrule') {
+            // console.log(JSON.stringify(rule.source, null, 2))
+            // start = rule.parent.nodes[0].start.line
+            const child = rule
+            rule = postcss
+              .atRule({
+                name: rule.parent.name,
+                params: rule.parent.params
+              })
+              .append(rule.clone())
+            rule.source = child.source
+            start = child.source.start.line
+          }
+          // console.log(
+          //   postcss.parse(rule).toString(),
+          //   '\n',
+          //   start,
+          //   `\nIndex: ${idx}`,
+          //   JSON.stringify(sortedRoot.last, null, 2)
+          // )
           if (
-            idx === 0 ||
+            // idx === 0 ||
             sortedRoot.nodes.length === 0 ||
-            sortedRoot.last.source.line.start < rule.source.line.start
+            (sortedRoot.last && sortedRoot.last.source.start.line > start)
           ) {
             sortedRoot
               .prepend(rule)
