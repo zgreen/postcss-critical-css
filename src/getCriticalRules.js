@@ -43,7 +43,7 @@ export function getCriticalRules (
   css: Object,
   shouldPreserve: boolean,
   defaultDest: string
-) {
+): Object {
   const critical: Object = getCriticalFromAtRule({ css })
   css.walkDecls('critical-selector', (decl: Object) => {
     const { parent, value } = decl
@@ -102,14 +102,16 @@ export function getCriticalRules (
           ) {
             sortedRoot
               .prepend(rule)
-              .walkDecls('critical-selector', criticalSelector =>
-                criticalSelector.remove()
+              .walkDecls(
+                'critical-selector',
+                (criticalSelector: Object): void => criticalSelector.remove()
               )
           } else {
             sortedRoot
               .append(rule)
-              .walkDecls('critical-selector', criticalSelector =>
-                criticalSelector.remove()
+              .walkDecls(
+                'critical-selector',
+                (criticalSelector: Object): void => criticalSelector.remove()
               )
           }
         })
@@ -129,5 +131,4 @@ export function getCriticalRules (
     decl.remove()
   })
   return critical
-  // return new Promise(resolve => resolve(critical))
 }

@@ -74,33 +74,13 @@ function buildCritical (options: Object): Function {
     ).reduce((init: Object, cur: string): Function => {
       const criticalCSS = postcss.root()
       const filePath = path.join(outputPath, cur)
-      criticalOutput[cur].each((rule: Object): void => {
+      criticalOutput[cur].each((rule: Object): Function =>
         criticalCSS.append(rule.clone())
-      })
+      )
       return postcss(minify ? [cssnano] : [])
         .process(criticalCSS)
         .then(dryRunOrWriteFile.bind(null, dryRun, filePath))
     }, {})
-    // getCriticalRules(css, preserve, outputDest)
-    //   .catch((err: string) => {
-    //     console.error(`${red.bold('Error:')} ${err}`)
-    //     process.exit(1)
-    //   })
-    //   .then((criticalOutput: Object): Object => {
-    //     return Object.keys(
-    //       criticalOutput
-    //     ).reduce((init: Object, cur: string): Object => {
-    //       const criticalCSS = postcss.root()
-    //       const filePath = path.join(outputPath, cur)
-    //       criticalOutput[cur].each((rule: Object) => {
-    //         criticalCSS.append(rule.clone())
-    //       })
-    //       postcss(minify ? [cssnano] : [])
-    //         .process(criticalCSS)
-    //         .then(dryRunOrWriteFile.bind(null, dryRun, filePath))
-    //       return criticalOutput
-    //     }, {})
-    //   })
   }
 }
 
