@@ -56,7 +56,7 @@ export function getCriticalRules (
           }).nodes[0],
           parent
         )
-      : parent
+      : parent.clone()
     const childRules = value === 'scope'
       ? getChildRules(css, parent, shouldPreserve)
       : []
@@ -68,7 +68,7 @@ export function getCriticalRules (
       case 'scope':
         const sortedRoot = postcss.root()
         let criticalRoot = critical[dest]
-        criticalRoot.append(container.clone())
+        criticalRoot.append(container)
 
         // Add all child rules
         if (childRules !== null && childRules.length) {
