@@ -5,11 +5,9 @@ import postcss from 'postcss'
  *
  * @param {Object} args Function args. See flow type alias.
  */
-type ArgsType = {filename?: string, css?: Object}
-type Options = {filename: string, css: Object}
-export function getCriticalFromAtRule (args: ArgsType): Object {
+export function getCriticalFromAtRule (args: Object): Object {
   const result: Object = {}
-  const options: Options = {
+  const options = {
     filename: 'critical.css',
     css: postcss.root(),
     ...args
@@ -21,9 +19,11 @@ export function getCriticalFromAtRule (args: ArgsType): Object {
     let rule = atRule
     if (!atRule.nodes) {
       rule = atRule.root()
-      rule.walkAtRules('critical', criticalRule => criticalRule.remove())
+      rule.walkAtRules('critical', (criticalRule: Object): void =>
+        criticalRule.remove()
+      )
     }
-    rule.clone().each(node => {
+    rule.clone().each((node: Object) => {
       result[name] = result[name]
         ? result[name].append(node)
         : postcss.root().append(node)
