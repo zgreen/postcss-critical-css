@@ -5,17 +5,24 @@ import { getChildRules } from './getChildRules'
 import { getCriticalFromAtRule } from './atRule'
 import { getCriticalDestination } from './getCriticalDestination'
 
-function appendCritical (root, update) {
-  update.clone().each(rule => {
-    let result = rule.root()
+/**
+ * Update a critical root.
+ *
+ * @param {Object} root Root object to update.
+ * @param {Object} update Update object.
+ * @return {Object} root
+ */
+function updateCritical (root: Object, update: Object): Object {
+  update.clone().each((rule: Object) => {
+    const ruleRoot = rule.root()
     root.append(
-      Object.keys(result).reduce((acc, key) => {
+      Object.keys(ruleRoot).reduce((acc: Object, key: string): Object => {
         if (key === 'nodes') {
-          acc.nodes = result.nodes.filter(
-            node => node.prop !== 'critical-selector'
+          acc.nodes = ruleRoot.nodes.filter(
+            (node: Object): boolean => node.prop !== 'critical-selector'
           )
         } else {
-          acc[key] = result[key]
+          acc[key] = ruleRoot[key]
         }
         return acc
       }, {})
@@ -43,7 +50,7 @@ export function getCriticalRules (
     const dest = getCriticalDestination(parent, defaultDest)
     const container = parent.parent.type === 'atrule' &&
       parent.parent.name === 'media'
-      ? appendCritical(
+      ? updateCritical(
           postcss.root().append({
             name: 'media',
             type: 'atrule',
@@ -67,9 +74,12 @@ export function getCriticalRules (
 
         // Add all child rules
         if (childRules !== null && childRules.length) {
-          criticalRoot = childRules.reduce((acc, rule) => {
-            return acc.append(rule.clone())
-          }, criticalRoot)
+          criticalRoot = childRules.reduce(
+            (acc: Object, rule: Object): Object => {
+              return acc.append(rule.clone())
+            },
+            criticalRoot
+          )
         }
 
         // Ensure source ordering is correct.
@@ -107,7 +117,7 @@ export function getCriticalRules (
         break
 
       case 'this':
-        appendCritical(critical[dest], container)
+        updateCritical(critical[dest], container)
         break
 
       default:
@@ -118,5 +128,6 @@ export function getCriticalRules (
 
     decl.remove()
   })
-  return new Promise(resolve => resolve(critical))
+  return critical
+  // return new Promise(resolve => resolve(critical))
 }

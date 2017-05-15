@@ -1,19 +1,11 @@
 // @flow
 
-import { red, green, yellow } from 'chalk'
+import { green, yellow } from 'chalk'
 import postcss from 'postcss'
 import cssnano from 'cssnano'
 import fs from 'fs'
 import path from 'path'
 import { getCriticalRules } from './getCriticalRules'
-
-// type CriticalBuildArgs = {
-//   outputDest: string,
-//   outputPath: string,
-//   preserve: boolean,
-//   minify: boolean,
-//   dryRun: boolean
-// }
 
 /**
  * Do a dry run, console.log the output.
@@ -74,28 +66,41 @@ function buildCritical (options: Object): Function {
     dryRun: false,
     ...options
   }
-  return (css: Object) => {
+  return (css: Object): Object => {
     const { dryRun, preserve, minify, outputPath, outputDest } = args
-    getCriticalRules(css, preserve, outputDest)
-      .catch((err: string) => {
-        console.error(`${red.bold('Error:')} ${err}`)
-        process.exit(1)
+    const criticalOutput = getCriticalRules(css, preserve, outputDest)
+    return Object.keys(
+      criticalOutput
+    ).reduce((init: Object, cur: string): Function => {
+      const criticalCSS = postcss.root()
+      const filePath = path.join(outputPath, cur)
+      criticalOutput[cur].each((rule: Object): void => {
+        criticalCSS.append(rule.clone())
       })
-      .then((criticalOutput: Object): Object => {
-        return Object.keys(
-          criticalOutput
-        ).reduce((init: Object, cur: string): Object => {
-          const criticalCSS = postcss.root()
-          const filePath = path.join(outputPath, cur)
-          criticalOutput[cur].each((rule: Object) => {
-            criticalCSS.append(rule.clone())
-          })
-          postcss(minify ? [cssnano] : [])
-            .process(criticalCSS)
-            .then(dryRunOrWriteFile.bind(null, dryRun, filePath))
-          return criticalOutput
-        }, {})
-      })
+      return postcss(minify ? [cssnano] : [])
+        .process(criticalCSS)
+        .then(dryRunOrWriteFile.bind(null, dryRun, filePath))
+    }, {})
+    // getCriticalRules(css, preserve, outputDest)
+    //   .catch((err: string) => {
+    //     console.error(`${red.bold('Error:')} ${err}`)
+    //     process.exit(1)
+    //   })
+    //   .then((criticalOutput: Object): Object => {
+    //     return Object.keys(
+    //       criticalOutput
+    //     ).reduce((init: Object, cur: string): Object => {
+    //       const criticalCSS = postcss.root()
+    //       const filePath = path.join(outputPath, cur)
+    //       criticalOutput[cur].each((rule: Object) => {
+    //         criticalCSS.append(rule.clone())
+    //       })
+    //       postcss(minify ? [cssnano] : [])
+    //         .process(criticalCSS)
+    //         .then(dryRunOrWriteFile.bind(null, dryRun, filePath))
+    //       return criticalOutput
+    //     }, {})
+    //   })
   }
 }
 
