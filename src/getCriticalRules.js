@@ -13,6 +13,34 @@ function clean (root, test = 'critical-selector') {
   return clone
 }
 
+function correctSourceOrder (root) {
+  const sortedRoot = postcss.root()
+  const clone = root.clone()
+  clone.walkRules((rule: Object) => {
+    let start = rule.source.start.line
+    if (rule.parent.type === 'atrule') {
+      const child = rule
+      rule = postcss
+        .atRule({
+          name: rule.parent.name,
+          params: rule.parent.params
+        })
+        .append(rule.clone())
+      rule.source = child.source
+      start = child.source.start.line
+    }
+    if (
+      sortedRoot.nodes.length === 0 ||
+      (sortedRoot.last && sortedRoot.last.source.start.line > start)
+    ) {
+      sortedRoot.prepend(rule)
+    } else {
+      sortedRoot.append(rule)
+    }
+  })
+  return sortedRoot
+}
+
 /**
  * Update a critical root.
  *
@@ -66,7 +94,6 @@ export function getCriticalRules (
 
     switch (value) {
       case 'scope':
-        const sortedRoot = postcss.root()
         let criticalRoot = critical[dest]
         criticalRoot.append(container)
 
@@ -79,31 +106,7 @@ export function getCriticalRules (
             criticalRoot
           )
         }
-
-        // Ensure source ordering is correct.
-        criticalRoot.walkRules((rule: Object) => {
-          let start = rule.source.start.line
-          if (rule.parent.type === 'atrule') {
-            const child = rule
-            rule = postcss
-              .atRule({
-                name: rule.parent.name,
-                params: rule.parent.params
-              })
-              .append(rule.clone())
-            rule.source = child.source
-            start = child.source.start.line
-          }
-          if (
-            sortedRoot.nodes.length === 0 ||
-            (sortedRoot.last && sortedRoot.last.source.start.line > start)
-          ) {
-            sortedRoot.prepend(rule)
-          } else {
-            sortedRoot.append(rule)
-          }
-        })
-        critical[dest] = clean(sortedRoot)
+        critical[dest] = clean(correctSourceOrder(criticalRoot))
         break
 
       default:
