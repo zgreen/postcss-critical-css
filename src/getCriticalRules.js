@@ -62,13 +62,13 @@ function correctSourceOrder (root: Object): Object {
  * @return {Object} A new root node with an atrule at its base.
  */
 function establishContainer (node: Object): Object {
-  return node.parent.type === 'atrule' && node.parent.name === 'media'
+  return node.parent.type === 'atrule' && node.parent.name !== 'critical'
     ? updateCritical(
-        postcss.root().append({
-          name: 'media',
-          type: 'atrule',
+        postcss.atRule({
+          name: node.parent.name,
+          type: node.parent.type,
           params: node.parent.params
-        }).nodes[0],
+        }),
         node
       )
     : node.clone()
