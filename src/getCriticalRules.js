@@ -5,7 +5,14 @@ import { getChildRules } from './getChildRules'
 import { getCriticalFromAtRule } from './atRule'
 import { getCriticalDestination } from './getCriticalDestination'
 
-function clean (root, test = 'critical-selector') {
+/**
+ * Clean a root node of a declaration.
+ *
+ * @param {Object} root PostCSS root node.
+ * @param {string} test Declaration string. Default  `critical-selector`
+ * @return {Object} clone Cloned, cleaned root node.
+ */
+function clean (root: Object, test: string = 'critical-selector'): Object {
   const clone = root.clone()
   clone.walkDecls(test, (decl: Object) => {
     decl.remove()
@@ -13,7 +20,13 @@ function clean (root, test = 'critical-selector') {
   return clone
 }
 
-function correctSourceOrder (root) {
+/**
+ * Correct the source order of nodes in a root.
+ *
+ * @param {Object} root PostCSS root node.
+ * @return {Object} sortedRoot Root with nodes sorted by source order.
+ */
+function correctSourceOrder (root: Object): Object {
   const sortedRoot = postcss.root()
   const clone = root.clone()
   clone.walkRules((rule: Object) => {
@@ -39,6 +52,26 @@ function correctSourceOrder (root) {
     }
   })
   return sortedRoot
+}
+
+/**
+ * Establish the container of a given node. Useful when preserving media queries
+ * or other atrules.
+ *
+ * @param {Object} node PostCSS node.
+ * @return {Object} A new root node with an atrule at its base.
+ */
+function establishContainer (node: Object): Object {
+  return node.parent.type === 'atrule' && node.parent.name === 'media'
+    ? updateCritical(
+        postcss.root().append({
+          name: 'media',
+          type: 'atrule',
+          params: node.parent.params
+        }).nodes[0],
+        node
+      )
+    : node.clone()
 }
 
 /**
@@ -74,38 +107,23 @@ export function getCriticalRules (
   css.walkDecls('critical-selector', (decl: Object) => {
     const { parent, value } = decl
     const dest = getCriticalDestination(parent, defaultDest)
-    const container = parent.parent.type === 'atrule' &&
-      parent.parent.name === 'media'
-      ? updateCritical(
-          postcss.root().append({
-            name: 'media',
-            type: 'atrule',
-            params: parent.parent.params
-          }).nodes[0],
-          parent
-        )
-      : parent.clone()
+    const container = establishContainer(parent)
     const childRules = value === 'scope'
       ? getChildRules(css, parent, shouldPreserve)
       : []
-    critical[dest] = typeof critical[dest] === 'undefined'
-      ? postcss.root()
-      : critical[dest]
+    // Sanity check, make sure we've got a root node
+    critical[dest] = critical[dest] || postcss.root()
 
     switch (value) {
       case 'scope':
-        let criticalRoot = critical[dest]
-        criticalRoot.append(container)
-
         // Add all child rules
-        if (childRules !== null && childRules.length) {
-          criticalRoot = childRules.reduce(
-            (acc: Object, rule: Object): Object => {
-              return acc.append(rule.clone())
-            },
-            criticalRoot
-          )
-        }
+        const criticalRoot = childRules.reduce(
+          (acc: Object, rule: Object): Object => {
+            return acc.append(rule.clone())
+          },
+          critical[dest].append(container)
+        )
+
         critical[dest] = clean(correctSourceOrder(criticalRoot))
         break
 
