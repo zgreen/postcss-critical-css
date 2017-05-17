@@ -10,11 +10,7 @@ import { matchChild } from './matchChild'
  * @param {Object} Parent rule for which children should be included
  * @param {boolean} Whether or not to keep the critical rule in the stylesheet
  */
-export function getChildRules (
-  css: Object,
-  parent: Object,
-  shouldPreserve: boolean
-): Array<Object> {
+export function getChildRules (css: Object, parent: Object): Array<Object> {
   const result = []
   const selectorRegExp: Object = new RegExp(parent.selector)
 
@@ -40,9 +36,6 @@ export function getChildRules (
         const clone = rule.clone()
         criticalAtRule.append(clone)
         result.push(criticalAtRule)
-        if (!shouldPreserve) {
-          rule.remove()
-        }
       }
     })
   })

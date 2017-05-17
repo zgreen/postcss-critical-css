@@ -8,6 +8,26 @@ import path from 'path'
 import { getCriticalRules } from './getCriticalRules'
 
 /**
+ * Clean the root.
+ */
+function clean (root, preserve) {
+  root.walkAtRules('critical', atRule => {
+    if (preserve === 'false' && !atRule.nodes) {
+      root.removeAll()
+    } else {
+      atRule.remove()
+    }
+  })
+  root.walkDecls(/critical-(selector|filename)/, decl => {
+    if (preserve === 'false') {
+      decl.parent.remove()
+    } else {
+      decl.remove()
+    }
+  })
+}
+
+/**
  * Do a dry run, console.log the output.
  *
  * @param {string} css CSS to output.
@@ -42,7 +62,7 @@ function dryRunOrWriteFile (
  * @param {string} filePath Path to write file to.
  * @param {string} css CSS to write to file.
  */
-function writeCriticalFile (filePath: string, css: string) {
+function writeCriticalFile (filePath: string, css: string, preserve: boolean) {
   fs.writeFile(filePath, css, (err: Object) => {
     if (err) {
       console.error(err)
@@ -68,7 +88,7 @@ function buildCritical (options: Object): Function {
   }
   return (css: Object): Object => {
     const { dryRun, preserve, minify, outputPath, outputDest } = args
-    const criticalOutput = getCriticalRules(css, preserve, outputDest)
+    const criticalOutput = getCriticalRules(css, outputDest)
     return Object.keys(
       criticalOutput
     ).reduce((init: Object, cur: string): Function => {

@@ -19,18 +19,12 @@ export function getCriticalFromAtRule (args: Object): Object {
     let rule = atRule
     if (!atRule.nodes) {
       rule = atRule.root()
-      rule.walkAtRules('critical', (criticalRule: Object): void =>
-        criticalRule.remove()
-      )
-      // Remove all nodes from the source root.
-      // options.css.removeAll()
     }
     rule.clone().each((node: Object) => {
       result[name] = result[name]
         ? result[name].append(node)
         : postcss.root().append(node)
     })
-    atRule.remove()
   })
   return result
 }

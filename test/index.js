@@ -13,18 +13,18 @@ const basePath = `${process.cwd()}/test/${fixturesDir}`
 
 function compareCritical (t, name, testNonCritical) {
   let actual = 'critical.css'
-  let expected = 'default.critical.expected.css'
-  if (name !== 'default') {
+  const expected = testNonCritical
+    ? `${name}.non-critical.expected.css`
+    : `${name}.critical.expected.css`
+  if (name !== 'default' || testNonCritical) {
     actual = testNonCritical
       ? `${name}.non-critical.actual.css`
       : `${name}.critical.actual.css`
-    expected = testNonCritical
-      ? `${name}.non-critical.expected.css`
-      : `${name}.critical.expected.css`
   }
+  console.log(expected, actual)
   t.equal(
-    fs.readFileSync(`${basePath}/${expected}`, 'utf8').trim(),
     fs.readFileSync(`${basePath}/${actual}`, 'utf8').trim(),
+    fs.readFileSync(`${basePath}/${expected}`, 'utf8').trim(),
     `Expect ${chalk.bold(name)} should be equal to actual output`
   )
   t.end()

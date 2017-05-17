@@ -98,19 +98,13 @@ function updateCritical (root: Object, update: Object): Object {
  * @param {string} Default output CSS file name.
  * @return {object} Object containing critical rules, organized by output destination
  */
-export function getCriticalRules (
-  css: Object,
-  shouldPreserve: boolean,
-  defaultDest: string
-): Object {
+export function getCriticalRules (css: Object, defaultDest: string): Object {
   const critical: Object = getCriticalFromAtRule({ css })
   css.walkDecls('critical-selector', (decl: Object) => {
     const { parent, value } = decl
     const dest = getCriticalDestination(parent, defaultDest)
     const container = establishContainer(parent)
-    const childRules = value === 'scope'
-      ? getChildRules(css, parent, shouldPreserve)
-      : []
+    const childRules = value === 'scope' ? getChildRules(css, parent) : []
     // Sanity check, make sure we've got a root node
     critical[dest] = critical[dest] || postcss.root()
 
@@ -131,7 +125,6 @@ export function getCriticalRules (
         critical[dest] = updateCritical(critical[dest], container)
         break
     }
-    decl.remove()
   })
   return critical
 }
