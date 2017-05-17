@@ -22,6 +22,8 @@ export function getCriticalFromAtRule (args: Object): Object {
       rule.walkAtRules('critical', (criticalRule: Object): void =>
         criticalRule.remove()
       )
+      // Remove all nodes from the source root.
+      // options.css.removeAll()
     }
     rule.clone().each((node: Object) => {
       result[name] = result[name]
