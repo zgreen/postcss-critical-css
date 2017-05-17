@@ -12,16 +12,20 @@ const fixturesDir = cliArgs['fixtures-dir'] || 'fixtures'
 const basePath = `${process.cwd()}/test/${fixturesDir}`
 
 function compareCritical (t, name, testNonCritical) {
-  console.log(name)
-  const suffix = testNonCritical ? 'non-critical.actual' : 'critical.actual'
-  const actualFilename = name.indexOf('default') !== -1 && !testNonCritical
-    ? 'critical'
-    : `${name}.${suffix}`
-  console.log(cyan.bold(actualFilename))
+  let actual = 'critical.css'
+  let expected = 'default.critical.expected.css'
+  if (name !== 'default') {
+    actual = testNonCritical
+      ? `${name}.non-critical.actual.css`
+      : `${name}.critical.actual.css`
+    expected = testNonCritical
+      ? `${name}.non-critical.expected.css`
+      : `${name}.critical.expected.css`
+  }
   t.equal(
-    fs.readFileSync(`${basePath}/${actualFilename}.css`, 'utf8').trim(),
-    fs.readFileSync(`${basePath}/${name}.${suffix}.css`, 'utf8').trim(),
-    `processed fixture ${chalk.bold(name)} should be equal to expected output`
+    fs.readFileSync(`${basePath}/${expected}`, 'utf8').trim(),
+    fs.readFileSync(`${basePath}/${actual}`, 'utf8').trim(),
+    `Expect ${chalk.bold(name)} should be equal to actual output`
   )
   t.end()
 }
