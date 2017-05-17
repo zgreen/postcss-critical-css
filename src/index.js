@@ -11,10 +11,19 @@ import { getCriticalRules } from './getCriticalRules'
  * Clean the root.
  */
 function clean (root, preserve) {
-  root.walkAtRules('critical', atRule => {
+  // console.log(root)
+  root.walkAtRules('critical', (atRule, idx) => {
+    // if (atRule.params === 'atRule.critical.actual.css') {
+    //   console.log(atRule.remove())
+    // }
+    // console.log(postcss.parse(atRule).toString())
+    // if (atRule.params === 'atRule.critical.actual.css') {
+    //   console.log(atRule)
+    // }
     if (preserve === 'false' && !atRule.nodes) {
       root.removeAll()
     } else {
+      // atRule.append({ prop: 'color', value: 'HEYYYY' })
       atRule.remove()
     }
   })
@@ -47,13 +56,11 @@ function doDryRun (css: string) {
  * @param {Object} result PostCSS root object.
  * @return {Function} Calls writeCriticalFile or doDryRun
  */
-function dryRunOrWriteFile (
-  dryRun: boolean,
-  filePath: string,
-  result: Object
-): void {
+function dryRunOrWriteFile (dryRun: boolean, filePath: string, result: Object) {
   const { css } = result
-  return dryRun ? doDryRun(css) : writeCriticalFile(filePath, css)
+  return new Promise(resolve =>
+    resolve(dryRun ? doDryRun(css) : writeCriticalFile(filePath, css))
+  )
 }
 
 /**
@@ -62,7 +69,7 @@ function dryRunOrWriteFile (
  * @param {string} filePath Path to write file to.
  * @param {string} css CSS to write to file.
  */
-function writeCriticalFile (filePath: string, css: string, preserve: boolean) {
+function writeCriticalFile (filePath: string, css: string) {
   fs.writeFile(filePath, css, (err: Object) => {
     if (err) {
       console.error(err)
@@ -100,6 +107,7 @@ function buildCritical (options: Object): Function {
       return postcss(minify ? [cssnano] : [])
         .process(criticalCSS)
         .then(dryRunOrWriteFile.bind(null, dryRun, filePath))
+        .then(clean.bind(null, css, preserve))
     }, {})
   }
 }

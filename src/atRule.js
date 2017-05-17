@@ -21,9 +21,11 @@ export function getCriticalFromAtRule (args: Object): Object {
       rule = atRule.root()
     }
     rule.clone().each((node: Object) => {
-      result[name] = result[name]
-        ? result[name].append(node)
-        : postcss.root().append(node)
+      if (node.name !== 'critical') {
+        result[name] = result[name]
+          ? result[name].append(node)
+          : postcss.root().append(node)
+      }
     })
   })
   return result
