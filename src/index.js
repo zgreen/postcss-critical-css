@@ -118,10 +118,10 @@ function writeCriticalFile (filePath: string, css: string) {
 /**
  * Primary plugin function.
  *
- * @param {object} array of options.
+ * @param {object} options Object of function args.
  * @return {function} function for PostCSS plugin.
  */
-function buildCritical (options: Object): Function {
+function buildCritical (options: Object = {}): Function {
   const filteredOptions = Object.keys(options).reduce(
     (acc: Object, key: string): Object =>
       typeof options[key] !== 'undefined'

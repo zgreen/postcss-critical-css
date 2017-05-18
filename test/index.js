@@ -9,7 +9,10 @@ const cliArgs = require('minimist')(process.argv.slice(2), {
   default: { preserve: true }
 })
 const fixturesDir = cliArgs['fixtures-dir'] || 'fixtures'
-const basePath = cliArgs.outputPath || `${process.cwd()}/test/${fixturesDir}`
+let basePath = cliArgs.outputPath || `${process.cwd()}/test/${fixturesDir}`
+if (cliArgs.noArgs) {
+  basePath = process.cwd()
+}
 
 function compareCritical (t, name, testNonCritical) {
   let actual = cliArgs.outputDest || 'critical.css'

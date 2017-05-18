@@ -8,7 +8,7 @@ const cliArgs = require('minimist')(process.argv.slice(2), {
 })
 const fixturesDir = cliArgs['fixtures-dir'] || 'fixtures'
 let basePath = cliArgs.outputPath || `${process.cwd()}/test/${fixturesDir}`
-const pluginOpts = Object.assign(
+let pluginOpts = Object.assign(
   {},
   {
     outputDest: cliArgs.outputDest,
@@ -16,6 +16,10 @@ const pluginOpts = Object.assign(
     preserve: typeof cliArgs.preserve !== 'undefined' ? cliArgs.preserve : true
   }
 )
+if (cliArgs.noArgs) {
+  basePath = process.cwd()
+  pluginOpts = {}
+}
 
 function useFileData (data, file) {
   postcssCriticalCSS
@@ -58,9 +62,11 @@ function deleteOldFixtures (files) {
 
 function writeNewFixtures (totalProcessed, files) {
   if (totalProcessed !== files.length) {
+    return
   }
   files.forEach(file => {
     if (
+      file.indexOf('.css') !== -1 &&
       file.indexOf('.expected') === -1 &&
       file.indexOf('.actual') === -1 &&
       file !== 'critical.css'
