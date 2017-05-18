@@ -46,7 +46,8 @@
     "eslint": "eslint test/**/*.js && eslint src/**",
     "start": "eslint src/** && npm run flow && babel src --out-dir lib --watch",
     "pretest": "./node_modules/.bin/babel-node test/preTest.js",
-    "test": "npm run build && npm run pretest && tape test",
+    "test": "npm run build && npm run test-default && npm run test-no-preserve",
+    "test-default": "npm run pretest && tape test",
     "test-no-preserve": "npm run pretest -- --fixtures-dir=fixtures-no-preserve --preserve=false && tape test --fixtures-dir=fixtures-no-preserve --preserve=false"
   },
   "dependencies": {
