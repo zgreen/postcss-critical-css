@@ -6,11 +6,11 @@ This plugin allows the user to define and output critical CSS using custom atRul
 
 ## Install
 
-`npm install postcss-critical-css --save-dev`
+`npm install postcss-critical-css --save`
 
 ## Examples
 
-A live example is available in this repo. See the `/example` directory, and use the command `npm run example` to test it out.
+An example is available in this repo. See the `/example` directory, and use the command `npm run example` to test it out.
 
 ### Using the `@critical` atRule
 
