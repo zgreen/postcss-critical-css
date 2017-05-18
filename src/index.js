@@ -11,25 +11,34 @@ import { getCriticalRules } from './getCriticalRules'
  * Clean the root.
  */
 function clean (root, preserve) {
-  // console.log(root)
   root.walkAtRules('critical', (atRule, idx) => {
-    // if (atRule.params === 'atRule.critical.actual.css') {
-    //   console.log(atRule.remove())
-    // }
-    // console.log(postcss.parse(atRule).toString())
-    // if (atRule.params === 'atRule.critical.actual.css') {
-    //   console.log(atRule)
-    // }
-    if (preserve === 'false' && !atRule.nodes) {
+    if (preserve === false && !atRule.nodes) {
       root.removeAll()
     } else {
-      // atRule.append({ prop: 'color', value: 'HEYYYY' })
       atRule.remove()
     }
   })
   root.walkDecls(/critical-(selector|filename)/, decl => {
-    if (preserve === 'false') {
-      decl.parent.remove()
+    if (preserve === false) {
+      if (decl.value === 'scope') {
+        root.walk(node => {
+          if (
+            node.selector &&
+            node.selector.indexOf(decl.parent.selector) === 0
+          ) {
+            node.remove()
+          }
+        })
+      }
+      let wrapper = {}
+      if (decl && decl.parent) {
+        wrapper = decl.parent.parent
+        decl.parent.remove()
+      }
+      // If the wrapper has no valid child nodes, remove it entirely.
+      if (wrapper && wrapper.nodes.filter(node => node !== decl).length === 0) {
+        wrapper.remove()
+      }
     } else {
       decl.remove()
     }

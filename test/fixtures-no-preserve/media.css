@@ -1,0 +1,8 @@
+@media (min-width: 700px) {
+  .foo {
+    color: red;
+    critical-selector: this;
+    width: 100%;
+    critical-filename: 'media.critical.actual.css';
+  }
+}
