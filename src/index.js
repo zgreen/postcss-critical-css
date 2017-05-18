@@ -26,7 +26,14 @@ function clean (root, preserve) {
             node.selector &&
             node.selector.indexOf(decl.parent.selector) === 0
           ) {
-            node.remove()
+            if (
+              node.parent &&
+              node.parent.nodes.filter(child => child !== node).length === 0
+            ) {
+              node.parent.remove()
+            } else {
+              node.remove()
+            }
           }
         })
       }
