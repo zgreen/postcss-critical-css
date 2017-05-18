@@ -122,13 +122,20 @@ function writeCriticalFile (filePath: string, css: string) {
  * @return {function} function for PostCSS plugin.
  */
 function buildCritical (options: Object): Function {
+  const filteredOptions = Object.keys(options).reduce(
+    (acc: Object, key: string): Object =>
+      typeof options[key] !== 'undefined'
+        ? { ...acc, [key]: options[key] }
+        : acc,
+    {}
+  )
   const args = {
     outputPath: process.cwd(),
     outputDest: 'critical.css',
     preserve: true,
     minify: true,
     dryRun: false,
-    ...options
+    ...filteredOptions
   }
   return (css: Object): Object => {
     const { dryRun, preserve, minify, outputPath, outputDest } = args

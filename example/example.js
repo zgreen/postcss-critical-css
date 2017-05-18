@@ -10,7 +10,6 @@ function cb (files) {
     postcss([postcssCriticalCSS({ outputPath: basePath })])
       .process(data)
       .then(result => {
-        console.log('THEN', result, file.split('.')[0])
         fs.writeFile(
           `${basePath}/${file.split('.')[0]}.non-critical.css`,
           result.css,

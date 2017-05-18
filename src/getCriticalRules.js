@@ -99,7 +99,7 @@ function updateCritical (root: Object, update: Object): Object {
  * @return {object} Object containing critical rules, organized by output destination
  */
 export function getCriticalRules (css: Object, defaultDest: string): Object {
-  const critical: Object = getCriticalFromAtRule({ css })
+  const critical: Object = getCriticalFromAtRule({ css, defaultDest })
   css.walkDecls('critical-selector', (decl: Object) => {
     const { parent, value } = decl
     const dest = getCriticalDestination(parent, defaultDest)

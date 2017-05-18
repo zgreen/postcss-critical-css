@@ -7,11 +7,12 @@ const cliArgs = require('minimist')(process.argv.slice(2), {
   default: { preserve: true }
 })
 const fixturesDir = cliArgs['fixtures-dir'] || 'fixtures'
-const basePath = `${process.cwd()}/test/${fixturesDir}`
+let basePath = cliArgs.outputPath || `${process.cwd()}/test/${fixturesDir}`
 const pluginOpts = Object.assign(
   {},
-  { outputPath: basePath },
   {
+    outputDest: cliArgs.outputDest,
+    outputPath: basePath,
     preserve: typeof cliArgs.preserve !== 'undefined' ? cliArgs.preserve : true
   }
 )
