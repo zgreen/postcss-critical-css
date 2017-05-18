@@ -7,18 +7,21 @@ var postcssCriticalCSS = require('..')
 const basePath = `${process.cwd()}/example`
 function cb (files) {
   function useFileData (data, file) {
-    postcss([postcssCriticalCSS.bind(null, {outputPath: basePath})])
+    postcss([postcssCriticalCSS({ outputPath: basePath })])
       .process(data)
-      .then(result =>
+      .then(result => {
+        console.log('THEN', result, file.split('.')[0])
         fs.writeFile(
           `${basePath}/${file.split('.')[0]}.non-critical.css`,
           result.css,
           err => {
-            console.error(err)
-            process.exit(1)
+            if (err) {
+              console.error(`ERROR: `, err)
+              process.exit(1)
+            }
           }
         )
-      )
+      })
   }
   files.forEach(function (file) {
     if (file === 'example.css') {

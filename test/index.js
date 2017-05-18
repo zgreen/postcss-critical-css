@@ -21,7 +21,7 @@ function compareCritical (t, name, testNonCritical) {
       ? `${name}.non-critical.actual.css`
       : `${name}.critical.actual.css`
   }
-  console.log(expected, actual)
+  console.log(`Comparing: ${expected} and ${actual}`)
   t.equal(
     fs.readFileSync(`${basePath}/${actual}`, 'utf8').trim(),
     fs.readFileSync(`${basePath}/${expected}`, 'utf8').trim(),
