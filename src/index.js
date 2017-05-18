@@ -8,28 +8,31 @@ import path from 'path'
 import { getCriticalRules } from './getCriticalRules'
 
 /**
- * Clean the root.
+ * Clean the original root node passed to the plugin, removing custom atrules,
+ * properties. Will additionally delete nodes as appropriate if
+ * `preserve === false`.
+ *
+ * @param {Object} root The root PostCSS object.
+ * @param {boolean} preserve Preserve identified critical CSS in the root?
  */
-function clean (root, preserve) {
-  root.walkAtRules('critical', (atRule, idx) => {
+function clean (root: Object, preserve: boolean) {
+  root.walkAtRules('critical', (atRule: Object) => {
     if (preserve === false && !atRule.nodes) {
       root.removeAll()
     } else {
       atRule.remove()
     }
   })
-  root.walkDecls(/critical-(selector|filename)/, decl => {
+  // @TODO `scope` Makes this kind of gnarly. This could be cleaned up a bit.
+  root.walkDecls(/critical-(selector|filename)/, (decl: Object) => {
     if (preserve === false) {
       if (decl.value === 'scope') {
-        root.walk(node => {
+        root.walk((node: Object) => {
           if (
             node.selector &&
             node.selector.indexOf(decl.parent.selector) === 0
           ) {
-            if (
-              node.parent &&
-              node.parent.nodes.filter(child => child !== node).length === 0
-            ) {
+            if (node.parent && hasNoOtherChildNodes(node.parent.nodes, node)) {
               node.parent.remove()
             } else {
               node.remove()
@@ -43,7 +46,7 @@ function clean (root, preserve) {
         decl.parent.remove()
       }
       // If the wrapper has no valid child nodes, remove it entirely.
-      if (wrapper && wrapper.nodes.filter(node => node !== decl).length === 0) {
+      if (wrapper && hasNoOtherChildNodes(wrapper.nodes, decl)) {
         wrapper.remove()
       }
     } else {
@@ -70,13 +73,31 @@ function doDryRun (css: string) {
  * @param {bool} dryRun Do a dry run?
  * @param {string} filePath Path to write file to.
  * @param {Object} result PostCSS root object.
- * @return {Function} Calls writeCriticalFile or doDryRun
+ * @return {Promise} Resolves with writeCriticalFile or doDryRun function call.
  */
-function dryRunOrWriteFile (dryRun: boolean, filePath: string, result: Object) {
+function dryRunOrWriteFile (
+  dryRun: boolean,
+  filePath: string,
+  result: Object
+): Promise<any> {
   const { css } = result
-  return new Promise(resolve =>
+  return new Promise((resolve: Function): void =>
     resolve(dryRun ? doDryRun(css) : writeCriticalFile(filePath, css))
   )
+}
+
+/**
+ * Confirm a node has no child nodes other than a specific node.
+ *
+ * @param {array} nodes Nodes array to check.
+ * @param {Object} node Node to check.
+ * @return {boolean} Whether or not the node has no other children.
+ */
+function hasNoOtherChildNodes (
+  nodes: Array<Object> = [],
+  node: Object = postcss.root()
+): boolean {
+  return nodes.filter((child: Object): boolean => child !== node).length === 0
 }
 
 /**
