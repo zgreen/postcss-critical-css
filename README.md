@@ -2,7 +2,7 @@
 
 ![Travis build status](https://travis-ci.org/zgreen/postcss-critical-css.svg?branch=master)
 
-This plugin allows the user to define and output critical CSS using custom atRules, and/or custom CSS properties. Critical CSS may be output to one or more files, as defined within the [plugin options](/#plugin-options) and/or within the CSS. Depending on the plugin options used, processed CSS may be left unchanged, or critical CSS may be removed from it.
+This plugin allows the user to define and output critical CSS using custom atRules, and/or custom CSS properties. Critical CSS may be output to one or more files, as defined within the [plugin options](#plugin-options) and/or within the CSS. Depending on the plugin options used, processed CSS may be left unchanged, or critical CSS may be removed from it.
 
 ## Install
 
@@ -14,7 +14,7 @@ An example is available in this repo. See the `/example` directory, and use the 
 
 ## Usage examples
 
-All examples given below show the input CSS and the critical CSS that is output from it. Note that the input CSS will remain unchanged, unless `preserve` is set to `false` in the [plugin options](/#plugin-options). Use `npm run example` to see how this works. 
+All examples given below show the input CSS and the critical CSS that is output from it. Note that the input CSS will remain unchanged, unless `preserve` is set to `false` in the [plugin options](#plugin-options). Use `npm run example` to see how this works. 
 
 ### Using the `@critical` atRule
 
