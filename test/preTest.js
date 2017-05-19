@@ -3,14 +3,15 @@ const fs = require('fs')
 const { bold, red } = require('chalk')
 const postcssCriticalCSS = require('..')
 const cliArgs = require('minimist')(process.argv.slice(2), {
-  boolean: ['preserve'],
-  default: { preserve: true }
+  boolean: ['minify', 'preserve'],
+  default: { minify: true, preserve: true }
 })
 const fixturesDir = cliArgs['fixtures-dir'] || 'fixtures'
 let basePath = cliArgs.outputPath || `${process.cwd()}/test/${fixturesDir}`
 let pluginOpts = Object.assign(
   {},
   {
+    minify: cliArgs.minify,
     outputDest: cliArgs.outputDest,
     outputPath: basePath,
     preserve: typeof cliArgs.preserve !== 'undefined' ? cliArgs.preserve : true

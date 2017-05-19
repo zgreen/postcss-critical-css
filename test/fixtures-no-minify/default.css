@@ -1,0 +1,8 @@
+@critical;
+
+.default {
+  color: orange;
+  float: left;
+  margin-right: 1em;
+  width: 100%;
+}
