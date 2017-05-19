@@ -1,0 +1,11 @@
+.foo {
+  color: gold;
+  height: 100px;
+}
+
+@critical atRule-wrapping.critical.actual.css {
+  .bar {
+    color: tomato;
+    height: 200px;
+  }
+}

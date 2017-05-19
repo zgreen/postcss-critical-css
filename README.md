@@ -2,15 +2,19 @@
 
 ![Travis build status](https://travis-ci.org/zgreen/postcss-critical-css.svg?branch=master)
 
-This plugin allows the user to define and output critical CSS using custom atRules, and/or custom CSS properties. Critical CSS may be output to one or more files, as defined within the plugin options or within the CSS.
+This plugin allows the user to define and output critical CSS using custom atRules, and/or custom CSS properties. Critical CSS may be output to one or more files, as defined within the [plugin options](#plugin-options) and/or within the CSS. Depending on the plugin options used, processed CSS may be left unchanged, or critical CSS may be removed from it.
 
 ## Install
 
-`npm install postcss-critical-css --save-dev`
+`npm install postcss-critical-css --save`
 
 ## Examples
 
-A live example is available in this repo. See the `/example` directory, and use the command `npm run example` to test it out.
+An example is available in this repo. See the `/example` directory, and use the command `npm run example` to test it out.
+
+## Usage examples
+
+All examples given below show the input CSS and the critical CSS that is output from it. Note that the input CSS will remain unchanged, unless `preserve` is set to `false` in the [plugin options](#plugin-options). Use `npm run example` to see how this works. 
 
 ### Using the `@critical` atRule
 
@@ -183,14 +187,9 @@ Will output:
 
 The plugin takes a single object as its only parameter. The following properties are valid:
 
-| Arg          | Type      | Description                                 | Default |
+| Arg          | Type      | Description                                 | Default                   |
 | ------------ | --------- | ------------------------------------------- | ------------------------- |
 | `outputPath` | `string`  | Path to which critical CSS should be output | Current working directory |
-| `outputDest` | `string`  | Default critical CSS file name | `"critical.css"` |
+| `outputDest` | `string`  | Default critical CSS file name              | `"critical.css"`          |
 | `preserve`   | `boolean` | Whether or not to remove selectors from primary CSS document once they've been marked as critical. This should prevent duplication of selectors across critical and non-critical CSS. | `true` |
-| `minify`     | `boolean` | Minify output CSS? | `true` |
-
-## To Dos
-
-- More tests
-- More robust warnings
+| `minify`     | `boolean` | Minify output CSS?                          | `true` |

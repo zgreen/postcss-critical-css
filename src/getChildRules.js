@@ -8,12 +8,9 @@ import { matchChild } from './matchChild'
  *
  * @param {Object} PostCSS CSS object
  * @param {Object} Parent rule for which children should be included
- * @param {boolean} Whether or not to keep the critical rule in the stylesheet
+ * @return {array} Array of child rules.
  */
-export function getChildRules (
-  css: Object,
-  parent: Object,
-  shouldPreserve: boolean): Array<Object> {
+export function getChildRules (css: Object, parent: Object): Array<Object> {
   const result = []
   const selectorRegExp: Object = new RegExp(parent.selector)
 
@@ -36,11 +33,9 @@ export function getChildRules (
       })
       // Should append even if parent selector
       if (rule.selector === parent.selector || childRule) {
-        criticalAtRule.append(rule)
+        const clone = rule.clone()
+        criticalAtRule.append(clone)
         result.push(criticalAtRule)
-        if (!shouldPreserve) {
-          rule.remove()
-        }
       }
     })
   })

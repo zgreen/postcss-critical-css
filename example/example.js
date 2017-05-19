@@ -2,17 +2,27 @@
 var fs = require('fs')
 var test = require('tape')
 var postcss = require('postcss')
-var postcssCriticalCSS = require('..');
+var postcssCriticalCSS = require('..')
 
-const basePath = `${process.cwd()}/example`;
+const basePath = `${process.cwd()}/example`
 function cb (files) {
   function useFileData (data, file) {
-    postcss([postcssCriticalCSS({outputPath: basePath})])
+    postcss([postcssCriticalCSS({ outputPath: basePath })])
       .process(data)
-      .then(result => fs.writeFile(
-        `${basePath}/${file.split('.')[0]}.non-critical.css`, result.css))
+      .then(result => {
+        fs.writeFile(
+          `${basePath}/${file.split('.')[0]}.non-critical.css`,
+          result.css,
+          err => {
+            if (err) {
+              console.error(`ERROR: `, err)
+              process.exit(1)
+            }
+          }
+        )
+      })
   }
-  files.forEach(function(file) {
+  files.forEach(function (file) {
     if (file === 'example.css') {
       fs.readFile(`${basePath}/${file}`, 'utf8', (err, data) => {
         if (err) {
