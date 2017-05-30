@@ -63,14 +63,12 @@ function correctSourceOrder (root: Object): Object {
  */
 function establishContainer (node: Object): Object {
   return node.parent.type === 'atrule' && node.parent.name !== 'critical'
-    ? updateCritical(
-        postcss.atRule({
-          name: node.parent.name,
-          type: node.parent.type,
-          params: node.parent.params
-        }),
-        node
-      )
+    ? postcss.atRule({
+      name: node.parent.name,
+      type: node.parent.type,
+      params: node.parent.params,
+      nodes: [node]
+    })
     : node.clone()
 }
 
