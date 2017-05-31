@@ -31,8 +31,14 @@ export function getChildRules (css: Object, parent: Object): Array<Object> {
         name: atRule.name,
         params: atRule.params
       })
-      // Should append even if parent selector
-      if (rule.selector === parent.selector || childRule) {
+      /**
+       * Should append even if parent selector, but make sure the two rules
+       * aren't identical.
+       */
+      if (
+        (rule.selector === parent.selector || childRule) &&
+        postcss.parse(rule).toString() !== postcss.parse(parent).toString()
+      ) {
         const clone = rule.clone()
         criticalAtRule.append(clone)
         result.push(criticalAtRule)
