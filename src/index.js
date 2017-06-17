@@ -107,7 +107,7 @@ function hasNoOtherChildNodes (
  * @param {string} css CSS to write to file.
  */
 function writeCriticalFile (filePath: string, css: string) {
-  fs.writeFile(filePath, css, (err: Object) => {
+  fs.writeFile(filePath, css, { flag: 'a' }, (err: Object) => {
     if (err) {
       console.error(err)
       process.exit(1)
