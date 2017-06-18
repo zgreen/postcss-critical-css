@@ -7,6 +7,8 @@ import fs from 'fs'
 import path from 'path'
 import { getCriticalRules } from './getCriticalRules'
 
+let append = false
+
 /**
  * Clean the original root node passed to the plugin, removing custom atrules,
  * properties. Will additionally delete nodes as appropriate if
@@ -107,7 +109,8 @@ function hasNoOtherChildNodes (
  * @param {string} css CSS to write to file.
  */
 function writeCriticalFile (filePath: string, css: string) {
-  fs.writeFile(filePath, css, { flag: 'a' }, (err: Object) => {
+  fs.writeFile(filePath, css, { flag: append ? 'a' : 'w' }, (err: Object) => {
+    append = true
     if (err) {
       console.error(err)
       process.exit(1)
@@ -137,6 +140,7 @@ function buildCritical (options: Object = {}): Function {
     dryRun: false,
     ...filteredOptions
   }
+  append = false
   return (css: Object): Object => {
     const { dryRun, preserve, minify, outputPath, outputDest } = args
     const criticalOutput = getCriticalRules(css, outputDest)
