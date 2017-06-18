@@ -19,10 +19,18 @@ let append = false
  */
 function clean (root: Object, preserve: boolean) {
   root.walkAtRules('critical', (atRule: Object) => {
-    if (preserve === false && !atRule.nodes) {
-      root.removeAll()
+    if (preserve === false) {
+      if (atRule.nodes && atRule.nodes.length) {
+        atRule.remove()
+      } else {
+        root.removeAll()
+      }
     } else {
-      atRule.remove()
+      if (atRule.nodes && atRule.nodes.length) {
+        atRule.replaceWith(atRule.nodes)
+      } else {
+        atRule.remove()
+      }
     }
   })
   // @TODO `scope` Makes this kind of gnarly. This could be cleaned up a bit.
