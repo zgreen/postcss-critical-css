@@ -7,6 +7,9 @@ import fs from 'fs'
 import path from 'path'
 import { getCriticalRules } from './getCriticalRules'
 
+/**
+ * Append to an existing critical CSS file?
+ */
 let append = false
 
 /**
