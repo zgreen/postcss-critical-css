@@ -1,6 +1,6 @@
 {
   "name": "postcss-critical-css",
-  "version": "2.1.5",
+  "version": "3.0.0",
   "description": "Generate critical CSS using PostCSS",
   "main": "index.js",
   "repository": {
@@ -31,7 +31,7 @@
     "eslint-plugin-node": "^4.2.2",
     "eslint-plugin-promise": "^3.4.0",
     "eslint-plugin-standard": "^3.0.1",
-    "flow-bin": "^0.45.0",
+    "flow-bin": "^0.48.0",
     "minimist": "^1.2.0",
     "tape": "^4.6.0"
   },

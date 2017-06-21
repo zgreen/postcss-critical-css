@@ -8,6 +8,11 @@ import path from 'path'
 import { getCriticalRules } from './getCriticalRules'
 
 /**
+ * Append to an existing critical CSS file?
+ */
+let append = false
+
+/**
  * Clean the original root node passed to the plugin, removing custom atrules,
  * properties. Will additionally delete nodes as appropriate if
  * `preserve === false`.
@@ -17,10 +22,18 @@ import { getCriticalRules } from './getCriticalRules'
  */
 function clean (root: Object, preserve: boolean) {
   root.walkAtRules('critical', (atRule: Object) => {
-    if (preserve === false && !atRule.nodes) {
-      root.removeAll()
+    if (preserve === false) {
+      if (atRule.nodes && atRule.nodes.length) {
+        atRule.remove()
+      } else {
+        root.removeAll()
+      }
     } else {
-      atRule.remove()
+      if (atRule.nodes && atRule.nodes.length) {
+        atRule.replaceWith(atRule.nodes)
+      } else {
+        atRule.remove()
+      }
     }
   })
   // @TODO `scope` Makes this kind of gnarly. This could be cleaned up a bit.
@@ -107,12 +120,18 @@ function hasNoOtherChildNodes (
  * @param {string} css CSS to write to file.
  */
 function writeCriticalFile (filePath: string, css: string) {
-  fs.writeFile(filePath, css, (err: Object) => {
-    if (err) {
-      console.error(err)
-      process.exit(1)
+  fs.writeFile(
+    filePath,
+    css,
+    { flag: append ? 'a' : 'w' },
+    (err: ?ErrnoError) => {
+      append = true
+      if (err) {
+        console.error(err)
+        process.exit(1)
+      }
     }
-  })
+  )
 }
 
 /**
@@ -137,6 +156,7 @@ function buildCritical (options: Object = {}): Function {
     dryRun: false,
     ...filteredOptions
   }
+  append = false
   return (css: Object): Object => {
     const { dryRun, preserve, minify, outputPath, outputDest } = args
     const criticalOutput = getCriticalRules(css, outputDest)
