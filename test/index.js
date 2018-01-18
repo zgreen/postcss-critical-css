@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
-const { cyan } = require('chalk')
 const fs = require('fs')
 const test = require('tape')
 const chalk = require('chalk')
@@ -36,6 +35,7 @@ function compareCritical (t, name, testNonCritical) {
 function initTests (key) {
   const tests = {
     default: () => {
+      console.log('testing')
       test('Testing default critical result', t => {
         compareCritical(t, 'default')
       })
@@ -147,7 +147,8 @@ function initTests (key) {
   }
 
   if (key) {
-    tests[key]()
+    const keys = key.split(',')
+    keys.forEach(k => tests[k]())
   } else {
     Object.keys(tests).forEach(key => tests[key]())
   }
