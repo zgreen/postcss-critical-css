@@ -14,9 +14,13 @@ import { getCriticalDestination } from './getCriticalDestination'
  */
 function clean (root: Object, test: string = 'critical-selector'): Object {
   const clone = root.clone()
-  clone.walkDecls(test, (decl: Object) => {
-    decl.remove()
-  })
+  if (clone.type === 'decl') {
+    clone.remove()
+  } else {
+    clone.walkDecls(test, (decl: Object) => {
+      decl.remove()
+    })
+  }
   return clone
 }
 
@@ -81,10 +85,13 @@ function establishContainer (node: Object): Object {
  */
 function updateCritical (root: Object, update: Object): Object {
   const clonedRoot = root.clone()
-  update.clone().each((rule: Object) => {
-    const ruleRoot = rule.root()
-    clonedRoot.append(clean(ruleRoot))
-  })
+  if (update.type === 'rule') {
+    clonedRoot.append(clean(update.clone()))
+  } else {
+    update.clone().each((rule: Object) => {
+      clonedRoot.append(clean(rule.root()))
+    })
+  }
   return clonedRoot
 }
 

@@ -35,7 +35,6 @@ function compareCritical (t, name, testNonCritical) {
 function initTests (key) {
   const tests = {
     default: () => {
-      console.log('testing')
       test('Testing default critical result', t => {
         compareCritical(t, 'default')
       })
