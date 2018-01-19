@@ -160,19 +160,20 @@ function buildCritical (options: Object = {}): Function {
   return (css: Object): Object => {
     const { dryRun, preserve, minify, outputPath, outputDest } = args
     const criticalOutput = getCriticalRules(css, outputDest)
-    return Object.keys(
-      criticalOutput
-    ).reduce((init: Object, cur: string): Function => {
-      const criticalCSS = postcss.root()
-      const filePath = path.join(outputPath, cur)
-      criticalOutput[cur].each((rule: Object): Function =>
-        criticalCSS.append(rule.clone())
-      )
-      return postcss(minify ? [cssnano] : [])
-        .process(criticalCSS)
-        .then(dryRunOrWriteFile.bind(null, dryRun, filePath))
-        .then(clean.bind(null, css, preserve))
-    }, {})
+    return Object.keys(criticalOutput).reduce(
+      (init: Object, cur: string): Function => {
+        const criticalCSS = postcss.root()
+        const filePath = path.join(outputPath, cur)
+        criticalOutput[cur].each((rule: Object): Function =>
+          criticalCSS.append(rule.clone())
+        )
+        return postcss(minify ? [cssnano] : [])
+          .process(criticalCSS)
+          .then(dryRunOrWriteFile.bind(null, dryRun, filePath))
+          .then(clean.bind(null, css, preserve))
+      },
+      {}
+    )
   }
 }
 

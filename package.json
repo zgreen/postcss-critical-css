@@ -1,6 +1,6 @@
 {
   "name": "postcss-critical-css",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Generate critical CSS using PostCSS",
   "main": "index.js",
   "repository": {
@@ -19,21 +19,21 @@
   "author": "Zach Green",
   "license": "MIT",
   "devDependencies": {
-    "babel-cli": "^6.11.4",
+    "babel-cli": "^6.26.0",
     "babel-eslint": "^7.2.3",
     "babel-plugin-transform-flow-strip-types": "^6.8.0",
-    "babel-plugin-transform-object-rest-spread": "^6.20.2",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-preset-es2015": "^6.13.2",
     "eslint": "^3.3.1",
     "eslint-config-standard": "^10.2.1",
-    "eslint-plugin-flowtype": "^2.7.1",
-    "eslint-plugin-import": "^2.2.0",
-    "eslint-plugin-node": "^4.2.2",
-    "eslint-plugin-promise": "^3.4.0",
+    "eslint-plugin-flowtype": "^2.41.0",
+    "eslint-plugin-import": "^2.8.0",
+    "eslint-plugin-node": "^4.2.3",
+    "eslint-plugin-promise": "^3.6.0",
     "eslint-plugin-standard": "^3.0.1",
     "flow-bin": "^0.48.0",
     "minimist": "^1.2.0",
-    "tape": "^4.6.0"
+    "tape": "^4.8.0"
   },
   "scripts": {
     "build": "eslint src/** && npm run flow && babel src --out-dir lib",
@@ -42,17 +42,23 @@
     "eslint": "eslint test/**/*.js && eslint src/**",
     "start": "eslint src/** && npm run flow && babel src --out-dir lib --watch",
     "pretest": "./node_modules/.bin/babel-node test/preTest.js",
-    "test": "npm run build && npm run test-default && npm run test-no-preserve && npm run test-output-path && npm run test-output-dest && npm run test-no-args && npm run test-no-minify",
-    "test-no-args": "npm run pretest -- --noArgs && tape test --noArgs --test=default",
-    "test-no-minify": "npm run pretest -- --minify=false --fixtures-dir=fixtures-no-minify && tape test --fixtures-dir=fixtures-no-minify --test=default",
-    "test-output-dest": "npm run pretest -- --outputDest='custom.css' --fixtures-dir=fixtures-output-dest && tape test --outputDest='custom.css' --fixtures-dir=fixtures-output-dest --test=default",
+    "test":
+      "npm run build && npm run test-default && npm run test-no-preserve && npm run test-output-path && npm run test-output-dest && npm run test-no-args && npm run test-no-minify",
+    "test-no-args":
+      "npm run pretest -- --noArgs && tape test --noArgs --test=default",
+    "test-no-minify":
+      "npm run pretest -- --minify=false --fixtures-dir=fixtures-no-minify && tape test --fixtures-dir=fixtures-no-minify --test=default,this",
+    "test-output-dest":
+      "npm run pretest -- --outputDest='custom.css' --fixtures-dir=fixtures-output-dest && tape test --outputDest='custom.css' --fixtures-dir=fixtures-output-dest --test=default",
     "test-default": "npm run pretest && tape test",
-    "test-no-preserve": "npm run pretest -- --fixtures-dir=fixtures-no-preserve --preserve=false && tape test --fixtures-dir=fixtures-no-preserve --preserve=false",
-    "test-output-path": "npm run pretest -- --outputPath='test/fixtures-output-path' && tape test --outputPath='test/fixtures-output-path' --test=default"
+    "test-no-preserve":
+      "npm run pretest -- --fixtures-dir=fixtures-no-preserve --preserve=false && tape test --fixtures-dir=fixtures-no-preserve --preserve=false",
+    "test-output-path":
+      "npm run pretest -- --outputPath='test/fixtures-output-path' && tape test --outputPath='test/fixtures-output-path' --test=default"
   },
   "dependencies": {
     "chalk": "^1.1.3",
     "cssnano": "^3.7.4",
-    "postcss": "^6.0.1"
+    "postcss": "^6.0.16"
   }
 }

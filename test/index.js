@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
-const { cyan } = require('chalk')
 const fs = require('fs')
 const test = require('tape')
 const chalk = require('chalk')
@@ -147,7 +146,8 @@ function initTests (key) {
   }
 
   if (key) {
-    tests[key]()
+    const keys = key.split(',')
+    keys.forEach(k => tests[k]())
   } else {
     Object.keys(tests).forEach(key => tests[key]())
   }
