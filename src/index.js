@@ -3,7 +3,7 @@
 import { green, yellow } from 'chalk'
 import postcss from 'postcss'
 import cssnano from 'cssnano'
-import fs from 'fs'
+import fs from 'fs-extra'
 import path from 'path'
 import { getCriticalRules } from './getCriticalRules'
 
@@ -73,7 +73,7 @@ function clean (root: Object, preserve: boolean) {
  *
  * @param {string} css CSS to output.
  */
-function doDryRun (css: string) {
+async function doDryRun (css: string) {
   console.log(
     // eslint-disable-line no-console
     green(`Critical CSS result is: ${yellow(css)}`)
@@ -88,15 +88,17 @@ function doDryRun (css: string) {
  * @param {Object} result PostCSS root object.
  * @return {Promise} Resolves with writeCriticalFile or doDryRun function call.
  */
-function dryRunOrWriteFile (
+async function dryRunOrWriteFile (
   dryRun: boolean,
   filePath: string,
   result: Object
-): Promise<any> {
+) {
   const { css } = result
-  return new Promise((resolve: Function): void =>
-    resolve(dryRun ? doDryRun(css) : writeCriticalFile(filePath, css))
-  )
+  if (dryRun) {
+    await doDryRun(css)
+  } else {
+    await writeCriticalFile(filePath, css)
+  }
 }
 
 /**
@@ -119,8 +121,8 @@ function hasNoOtherChildNodes (
  * @param {string} filePath Path to write file to.
  * @param {string} css CSS to write to file.
  */
-function writeCriticalFile (filePath: string, css: string) {
-  fs.writeFile(
+async function writeCriticalFile (filePath: string, css: string) {
+  await fs.outputFile(
     filePath,
     css,
     { flag: append ? 'a' : 'w' },
@@ -169,8 +171,10 @@ function buildCritical (options: Object = {}): Function {
         )
         return postcss(minify ? [cssnano] : [])
           .process(criticalCSS)
-          .then(dryRunOrWriteFile.bind(null, dryRun, filePath))
-          .then(clean.bind(null, css, preserve))
+          .then(async (result: Object) => {
+            await dryRunOrWriteFile(dryRun, filePath, result)
+            clean.bind(null, css, preserve)
+          })
       },
       {}
     )
