@@ -170,10 +170,10 @@ function buildCritical (options: Object = {}): Function {
           criticalCSS.append(rule.clone())
         )
         return postcss(minify ? [cssnano] : [])
-          .process(criticalCSS)
+          .process(criticalCSS, { from: undefined })
           .then(async (result: Object) => {
             await dryRunOrWriteFile(dryRun, filePath, result)
-            clean.bind(null, css, preserve)
+            clean(css, preserve)
           })
       },
       {}

@@ -35,6 +35,7 @@
     "eslint-plugin-promise": "^3.6.0",
     "eslint-plugin-standard": "^3.0.1",
     "flow-bin": "^0.48.0",
+    "jest": "^23.1.0",
     "minimist": "^1.2.0",
     "tape": "^4.8.0"
   },
@@ -44,8 +45,7 @@
     "flow": "flow; test $? -eq 0 -o $? -eq 2",
     "eslint": "eslint test/**/*.js && eslint src/**",
     "start": "eslint src/** && npm run flow && babel src --out-dir lib --watch",
-    "pretest": "./node_modules/.bin/babel-node test/preTest.js",
-    "test": "npm run build && npm run test-default && npm run test-no-preserve && npm run test-output-path && npm run test-output-dest && npm run test-no-args && npm run test-no-minify",
+    "test": "jest",
     "test-no-args": "npm run pretest -- --noArgs && tape test --noArgs --test=default",
     "test-no-minify": "npm run pretest -- --minify=false --fixtures-dir=fixtures-no-minify && tape test --fixtures-dir=fixtures-no-minify --test=default,this",
     "test-output-dest": "npm run pretest -- --outputDest='custom.css' --fixtures-dir=fixtures-output-dest && tape test --outputDest='custom.css' --fixtures-dir=fixtures-output-dest --test=default",
@@ -58,8 +58,5 @@
     "cssnano": "^3.7.4",
     "fs-extra": "^6.0.1",
     "postcss": "^6.0.16"
-  },
-  "browserslist": [
-    "node 6"
-  ]
+  }
 }
