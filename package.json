@@ -45,13 +45,8 @@
     "flow": "flow; test $? -eq 0 -o $? -eq 2",
     "eslint": "eslint test/**/*.js && eslint src/**",
     "start": "eslint src/** && npm run flow && babel src --out-dir lib --watch",
-    "test": "jest --verbose",
-    "test-no-args": "npm run pretest -- --noArgs && tape test --noArgs --test=default",
-    "test-no-minify": "npm run pretest -- --minify=false --fixtures-dir=fixtures-no-minify && tape test --fixtures-dir=fixtures-no-minify --test=default,this",
-    "test-output-dest": "npm run pretest -- --outputDest='custom.css' --fixtures-dir=fixtures-output-dest && tape test --outputDest='custom.css' --fixtures-dir=fixtures-output-dest --test=default",
-    "test-default": "npm run pretest && tape test",
-    "test-no-preserve": "npm run pretest -- --fixtures-dir=fixtures-no-preserve --preserve=false && tape test --fixtures-dir=fixtures-no-preserve --preserve=false",
-    "test-output-path": "npm run pretest -- --outputPath='test/fixtures-output-path' && tape test --outputPath='test/fixtures-output-path' --test=default"
+    "pretest": "node test/preTest.js",
+    "test": "jest --verbose"
   },
   "dependencies": {
     "chalk": "^1.1.3",

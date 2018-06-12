@@ -169,6 +169,8 @@ function buildCritical (options: Object = {}): Function {
         criticalOutput[cur].each((rule: Object): Function =>
           criticalCSS.append(rule.clone())
         )
+        // Can't use async/await within a call to reduce effectively,
+        // hence leaving in chained `.then` for postcss().process
         return postcss(minify ? [cssnano] : [])
           .process(criticalCSS, { from: undefined })
           .then(async (result: Object) => {

@@ -1,11 +1,10 @@
 const compareCritical = require('./compareCritical');
-const { fsTimeout, normalizeOpts } = require('./utils');
+const { normalizeOpts } = require('./utils');
 const preTest = require('./preTest');
 
 const opts = normalizeOpts();
 beforeAll(async () => {
-  preTest('this', opts);
-  await fsTimeout();
+  await preTest('this', opts);
 });
 
 describe('tests for `critical-selector: this`', () => {

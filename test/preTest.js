@@ -1,50 +1,46 @@
 #!/usr/bin/env node
-const fs = require('fs')
+const util = require('util');
+const fs = require('fs-extra')
 const { bold, red } = require('chalk')
 const postcssCriticalCSS = require('..')
-const { normalizeOpts } = require('./utils');
-const postcss = require('postcss')
+const { fsTimeout, normalizeOpts } = require('./utils')
+const postcss = require('postcss');
 
-function useFileData (data, file, opts) {
+async function useFileData (data, file, opts) {
   const pluginOpts = normalizeOpts(opts)
 
-  postcss()
+  const result = await postcss()
     .use(postcssCriticalCSS(pluginOpts))
     .process(data, { from: file })
-    .catch(err => {
-      console.error(bold.red('Error: '), err)
-      process.exit(1)
-    })
-    .then((result) => {
-      try {
-        fs.writeFileSync(
-          `${opts.outputPath}/${file.split('.')[0]}.non-critical.actual.css`,
-          result.css,
-          'utf8'
-        )
-      } catch(err) {
-        throw new Error(err)
-      }
-    })
+
+  try {
+    await fs.writeFile(
+      `${opts.outputPath}/${file.split('.')[0]}.non-critical.actual.css`,
+      result.css,
+      'utf8'
+    )
+  } catch(err) {
+    throw new Error(err)
+  }
 }
 
-function deleteOldFixtures (files, filter, opts) {
-  files.forEach((file) => {
+async function deleteOldFixtures (files, filter, opts) {
+  for (let file of files) {
     if (
       (file.includes('.actual') && file.includes(filter)) ||
       file === 'critical.css'
     ) {
       try {
-        fs.unlinkSync(`${opts.outputPath}/${file}`)
+        await fs.unlink(`${opts.outputPath}/${file}`)
       } catch(err) {
         throw new Error(err)
       }
     }
-  })
+  }
 }
 
-function writeNewFixtures (files, name, opts) {
-  files.forEach((file) => {
+async function writeNewFixtures (files, name, opts) {
+  for (let file of files) {
     if (
       file.includes('.css') &&
       ! file.includes('.expected') &&
@@ -52,26 +48,28 @@ function writeNewFixtures (files, name, opts) {
       file !== 'critical.css'
     ) {
       try {
-        const data = fs.readFileSync(`${opts.outputPath}/${file}`, 'utf8')
-        useFileData(data, file, opts)
+        const data = await fs.readFile(`${opts.outputPath}/${file}`, 'utf8')
+        await useFileData(data, file, opts)
       } catch(err) {
         throw new Error(err)
       }
     }
-  })
+  }
 }
 
-module.exports = function preTest(name, opts) {
-  opts.outputPath = opts.outputPath || `${process.cwd()}/test/fixtures/${name}`
+module.exports = async function preTest(name, opts) {
+  const fixtureRoot = `${process.cwd()}/test/fixtures/`;
+  opts.outputPath = opts.outputPath || `${fixtureRoot}${name}`
   if (opts.noArgs) {
     opts.outputPath = process.cwd()
   }
 
   try {
-    const files = fs.readdirSync(opts.outputPath, 'utf8')
-    deleteOldFixtures(files, name, opts)
-    writeNewFixtures(files, name, opts)
+    const files = await fs.readdirSync(opts.outputPath, 'utf8')
+    await deleteOldFixtures(files, name, opts)
+    await writeNewFixtures(files, name, opts)
   } catch(err) {
     throw new Error(err)
   }
 }
+
