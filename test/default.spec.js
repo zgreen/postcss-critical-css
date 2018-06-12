@@ -1,15 +1,14 @@
 const compareCritical = require('./compareCritical');
-const { fsTimeout, getDefaultOpts } = require('./utils');
+const { fsTimeout, normalizeOpts } = require('./utils');
 const preTest = require('./preTest');
 
-const opts = getDefaultOpts();
-
-beforeAll(async () => {
-  preTest('default', opts);
-  await fsTimeout();
-});
-
 describe('default tests', () => {
+  const opts = normalizeOpts();
+  beforeAll(async () => {
+    preTest('default', opts);
+    await fsTimeout();
+  });
+
   it('should move styles into critical stylesheet if @critical at-rule is used', () => {
     compareCritical(opts, 'default')
   })
@@ -19,115 +18,54 @@ describe('default tests', () => {
   })
 })
 
-// function initTests (key) {
-//   const tests = {
-//     this: () => {
-//       test('Testing "this" critical result', t => {
-//         compareCritical(t, 'this')
-//       })
+describe('tests for `minify` option', () => {
+  const opts = normalizeOpts({ minify: false });
+  beforeAll(async () => {
+    preTest('options', opts);
+    await fsTimeout();
+  });
 
-//       test('Testing "this" non-critical result', t => {
-//         compareCritical(t, 'this', true)
-//       })
-//     },
+  it('should not minify critical CSS styles if `minify` option is set to `false`', () => {
+    compareCritical(opts, 'minify-false')
+  })
+})
 
-//     atRule: () => {
-//       test('Testing "atRule" critical result', t => {
-//         compareCritical(t, 'atRule')
-//       })
+describe('tests for `preserve` option', () => {
+  const opts = normalizeOpts({ preserve: false });
+  beforeAll(async () => {
+    preTest('options', opts);
+    await fsTimeout();
+  });
 
-//       test('Testing "atRule" non-critical result', t => {
-//         compareCritical(t, 'atRule', true)
-//       })
-//     },
+  it('should move selectors specified with `@critical` or `critical-selector` to critical css file', () => {
+    compareCritical(opts, 'preserve')
+  })
 
-//     atRuleWrapping: () => {
-//       test(
-//         chalk.yellow(
-//           `Testing ${chalk.bold('atRule.wrapping')} critical result`
-//         ),
-//         t => {
-//           compareCritical(t, 'atRule-wrapping')
-//         }
-//       )
+  it('should remove selectors specified with `@critical` or `critical-selector` from non-critical stylesheet', () => {
+    compareCritical(opts, 'preserve', true)
+  })
+})
 
-//       test(
-//         chalk.yellow(
-//           `Testing ${chalk.bold('atRule.wrapping')} non-critical result`
-//         ),
-//         t => {
-//           compareCritical(t, 'atRule-wrapping', true)
-//         }
-//       )
-//     },
+describe('tests for `outputDest` option', () => {
+  const opts = normalizeOpts({ outputDest: 'test-output-dest.critical.actual.css' });
+  beforeAll(async () => {
+    preTest('options', opts);
+    await fsTimeout();
+  });
 
-//     media: () => {
-//       test('Testing "media" critical result', t => {
-//         compareCritical(t, 'media')
-//       })
+  it('should output critical css to filename configured in `outputDest` option', () => {
+    compareCritical(opts, 'output-dest')
+  })
+})
 
-//       test('Testing "media" non-critical result', t => {
-//         compareCritical(t, 'media', true)
-//       })
-//     },
+describe('tests for `outputPath` option', () => {
+  const opts = normalizeOpts({ outputPath: `${process.cwd()}/test/fixtures/options/outputPath` });
+  beforeAll(async () => {
+    preTest('options', opts);
+    await fsTimeout();
+  });
 
-//     scope: () => {
-//       test(
-//         chalk.yellow(`Testing ${chalk.bold('scope')} critical result`),
-//         t => {
-//           compareCritical(t, 'scope')
-//         }
-//       )
-
-//       test(
-//         chalk.yellow(`Testing ${chalk.bold('scope')} non-critical result`),
-//         t => {
-//           compareCritical(t, 'scope', true)
-//         }
-//       )
-//     },
-
-//     mediaScope: () => {
-//       test(
-//         chalk.yellow(`Testing ${chalk.bold('media-scope')} critical result`),
-//         t => {
-//           compareCritical(t, 'media-scope')
-//         }
-//       )
-
-//       test(
-//         chalk.yellow(
-//           `Testing ${chalk.bold('media-scope')} non-critical result`
-//         ),
-//         t => {
-//           compareCritical(t, 'media-scope', true)
-//         }
-//       )
-//     },
-
-//     mediaThis: () => {
-//       test(
-//         chalk.yellow(`Testing ${chalk.bold('media-this')} critical result`),
-//         t => {
-//           compareCritical(t, 'media-this')
-//         }
-//       )
-
-//       test(
-//         chalk.yellow(`Testing ${chalk.bold('media-this')} non-critical result`),
-//         t => {
-//           compareCritical(t, 'media-this', true)
-//         }
-//       )
-//     }
-//   }
-
-//   if (key) {
-//     const keys = key.split(',')
-//     keys.forEach(k => tests[k]())
-//   } else {
-//     Object.keys(tests).forEach(key => tests[key]())
-//   }
-// }
-
-// initTests(cliArgs.test)
+  it('should output critical css to filename configured in `outputDest` option', () => {
+    compareCritical(opts, 'output-path')
+  })
+})

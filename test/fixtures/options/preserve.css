@@ -1,0 +1,18 @@
+.test-preserve {
+	color: red;
+	critical-selector: this;
+	critical-filename: preserve.critical.actual.css;
+	display: block;
+}
+
+@critical preserve.critical.actual.css {
+	.another-selector {
+		background-color: black;
+		color: white;
+	}
+}
+
+.this-selector-stays {
+	display: flex;
+	justify-content: center;
+}

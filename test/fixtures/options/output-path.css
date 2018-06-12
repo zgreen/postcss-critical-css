@@ -1,0 +1,6 @@
+.test-output-path {
+	color: blue;
+	critical-selector: this;
+	critical-filename: output-path.critical.actual.css;
+	font-family: Times;
+}
