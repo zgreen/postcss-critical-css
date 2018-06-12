@@ -1,0 +1,6 @@
+.foo {
+  color: red;
+  critical-selector: this;
+  width: 100%;
+  critical-filename: 'at-root.critical.actual.css';
+}

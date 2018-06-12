@@ -2,16 +2,11 @@
 const fs = require('fs')
 const { bold, red } = require('chalk')
 const postcssCriticalCSS = require('..')
-const { getDefaultOpts } = require('./utils');
+const { normalizeOpts } = require('./utils');
 const postcss = require('postcss')
 
 function useFileData (data, file, opts) {
-  const pluginOpts = getDefaultOpts({
-    minify: opts.minify,
-    outputDest: opts.outputDest,
-    outputPath: opts.basePath,
-    preserve: typeof opts.preserve !== 'undefined' ? opts.preserve : true
-  });
+  const pluginOpts = normalizeOpts(opts)
 
   postcss()
     .use(postcssCriticalCSS(pluginOpts))
@@ -23,7 +18,7 @@ function useFileData (data, file, opts) {
     .then((result) => {
       try {
         fs.writeFileSync(
-          `${opts.basePath}/${file.split('.')[0]}.non-critical.actual.css`,
+          `${opts.outputPath}/${file.split('.')[0]}.non-critical.actual.css`,
           result.css,
           'utf8'
         )
@@ -40,7 +35,7 @@ function deleteOldFixtures (files, filter, opts) {
       file === 'critical.css'
     ) {
       try {
-        fs.unlinkSync(`${opts.basePath}/${file}`)
+        fs.unlinkSync(`${opts.outputPath}/${file}`)
       } catch(err) {
         throw new Error(err)
       }
@@ -48,17 +43,16 @@ function deleteOldFixtures (files, filter, opts) {
   })
 }
 
-function writeNewFixtures (files, filter, opts) {
+function writeNewFixtures (files, name, opts) {
   files.forEach((file) => {
     if (
       file.includes('.css') &&
-      file.includes(filter) &&
       ! file.includes('.expected') &&
       ! file.includes('.actual') &&
       file !== 'critical.css'
     ) {
       try {
-        const data = fs.readFileSync(`${opts.basePath}/${file}`, 'utf8')
+        const data = fs.readFileSync(`${opts.outputPath}/${file}`, 'utf8')
         useFileData(data, file, opts)
       } catch(err) {
         throw new Error(err)
@@ -67,16 +61,16 @@ function writeNewFixtures (files, filter, opts) {
   })
 }
 
-module.exports = function preTest(filter, opts) {
-  opts.basePath = opts.outputPath || `${process.cwd()}/test/fixtures`
+module.exports = function preTest(name, opts) {
+  opts.outputPath = opts.outputPath || `${process.cwd()}/test/fixtures/${name}`
   if (opts.noArgs) {
-    opts.basePath = process.cwd()
+    opts.outputPath = process.cwd()
   }
 
   try {
-    const files = fs.readdirSync(opts.basePath, 'utf8')
-    deleteOldFixtures(files, filter, opts)
-    writeNewFixtures(files, filter, opts)
+    const files = fs.readdirSync(opts.outputPath, 'utf8')
+    deleteOldFixtures(files, name, opts)
+    writeNewFixtures(files, name, opts)
   } catch(err) {
     throw new Error(err)
   }

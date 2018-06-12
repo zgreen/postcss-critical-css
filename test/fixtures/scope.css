@@ -1,9 +1,0 @@
-.foo .bar {
-  color: green;
-}
-
-.foo {
-  color: orange;
-  critical-selector: scope;
-  critical-filename: scope.critical.actual.css;
-}

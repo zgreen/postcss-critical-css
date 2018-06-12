@@ -1,10 +1,11 @@
-module.exports.getDefaultOpts = (opts = {}) => {
+module.exports.normalizeOpts = (opts = {}) => {
   if (opts.noArgs) {
     return {};
   }
 
   return Object.assign({
-    preserve: true,
+    minify: true,
+    preserve: typeof opts.preserve !== 'undefined' ? opts.preserve : true
   }, opts);
 }
 

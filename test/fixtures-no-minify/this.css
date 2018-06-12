@@ -1,8 +1,0 @@
-.testing-this {
-  critical-filename: this.critical.actual.css;
-  critical-selector: this;
-  color: orange;
-  float: left;
-  margin-right: 1em;
-  width: 100%;
-}
