@@ -194,7 +194,15 @@ function buildCritical (options: Object = {}): Function {
   append = false
 
   return async (css: Object): Object => {
-    const { dryRun, preserve, minify, outputPath, outputDest } = args
+    const {
+      dryRun,
+      preserve,
+      minify,
+      outputPath,
+      outputDest,
+      ignoreSelectors,
+      fsWriteRate
+    } = args
     const criticalOutput = getCriticalRules(css, outputDest)
     let result = {}
 
@@ -203,7 +211,7 @@ function buildCritical (options: Object = {}): Function {
       const filePath = path.join(outputPath, outputFile)
       criticalOutput[outputFile].each((rule: Object): any => {
         // Check if we should remove this selector from output
-        const shouldIgnore = rule.selector && args.ignoreSelectors
+        const shouldIgnore = rule.selector && ignoreSelectors
           .some((ignore: string): boolean => rule.selector.includes(ignore))
         if (shouldIgnore) {
           return
@@ -213,7 +221,7 @@ function buildCritical (options: Object = {}): Function {
       })
       result = await postcss(minify ? [cssnano] : [])
         .process(criticalCSS, { from: undefined })
-      await dryRunOrWriteFile(dryRun, filePath, result, args.fsWriteRate)
+      await dryRunOrWriteFile(dryRun, filePath, result, fsWriteRate)
       clean(css, preserve)
     }
 

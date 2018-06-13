@@ -1,0 +1,16 @@
+@critical ignore-selectors.critical.actual.css;
+
+.foo {
+	color: blue;
+	font-style: italic;
+}
+
+.bar {
+	color: tomato;
+	display: flex;
+}
+
+.baz {
+	color: green;
+	text-decoration: underline;
+}

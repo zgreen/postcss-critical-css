@@ -1,3 +1,4 @@
+const path = require('path');
 const compareCritical = require('./compareCritical');
 const { normalizeOpts } = require('./utils');
 const preTest = require('./preTest');
@@ -40,12 +41,23 @@ describe('tests for `outputDest` option', () => {
 })
 
 describe('tests for `outputPath` option', () => {
-  const opts = normalizeOpts({ outputPath: `${process.cwd()}/test/fixtures/options/outputPath` });
+  const opts = normalizeOpts({ outputPath: path.join(__dirname, 'fixtures/options/outputPath') });
   beforeAll(async () => {
     await preTest('options', opts);
   });
 
-  it('should output critical css to filename configured in `outputDest` option', () => {
+  it('should output critical css to path configured in `outputPath` option', () => {
     compareCritical(opts, 'output-path')
+  })
+})
+
+describe('tests for `ignoreSelectors` option', () => {
+  const opts = normalizeOpts({ ignoreSelectors: [ 'foo', 'bar' ] });
+  beforeAll(async () => {
+    await preTest('options', opts);
+  });
+
+  it('should remove configured selectors in `ignoreSelectors` option from all critical stylesheets', () => {
+    compareCritical(opts, 'ignore-selectors')
   })
 })

@@ -1,0 +1,68 @@
+
+
+.foo .bar {
+  color: green;
+}
+
+.foo {
+  color: orange;
+}
+
+header.top {
+  background: red;
+}
+
+@media screen and (max-width: 400px) {
+  header.top {
+    width: 100%;
+  }
+}
+
+.bar-baz {
+  color: blue;
+  font-style: italic;
+}@media screen and (min-width: 1024px) {
+  .foo {
+    display: flex;
+    width: calc(100% - 200px);
+  }
+}
+@media screen and (min-width: 1024px) {
+
+  .bar {
+    border: 10px solid gold;
+    height: 100%;
+  }
+}
+@media screen and (min-width: 1024px) {
+
+  .baz::before {
+    content: 'test';
+    position: fixed;
+  }
+}
+
+.fs-test-five {
+  color: blue;
+  font-family: Times;
+}
+
+.fs-test-six {
+  color: blue;
+  font-family: Helvetica;
+}
+
+.foo {
+  display: flex;
+  width: calc(100% - 200px);
+}
+
+.bar {
+  border: 10px solid gold;
+  height: 100%;
+}
+
+  .bar {
+    color: tomato;
+    height: 200px;
+  }
