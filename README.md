@@ -194,3 +194,4 @@ The plugin takes a single object as its only parameter. The following properties
 | `preserve`        | `boolean` | Whether or not to remove selectors from primary CSS document once they've been marked as critical. This should prevent duplication of selectors across critical and non-critical CSS. | `true` |
 | `minify`          | `boolean` | Minify output CSS?                          | `true` |
 | `ignoreSelectors` | `array`   | Array of selectors to globally exclude from critical CSS output | `[]` |
+| `fsWriteRate`   | `number`  | Minimum amount of time between file writes, in millisenconds. This is intended to prevent overlapping file writes for codebases with numerous calls to `@critical` | `250` |

@@ -14,12 +14,26 @@ import { getCriticalRules } from './getCriticalRules'
 let append = false
 
 /**
- * Rate limiter for file writes
+ * Instance of Bottleneck for rate-limiting file writes
  */
-const limiter = new Bottleneck({
-  maxConcurrent: 1,
-  minTime: 250
-})
+let limiter
+
+/**
+ * Create or get a "singleton" instance of Bottleneck
+ *
+ * @param {number} fsWriteRate minimum time between file writes
+ * @return {Bottleneck} instnance of Bottleneck
+ */
+function createOrGetLimiter (fsWriteRate: number): Bottleneck {
+  if (!limiter) {
+    limiter = new Bottleneck({
+      maxConcurrent: 1,
+      minTime: fsWriteRate
+    })
+  }
+
+  return limiter
+}
 
 /**
  * Clean the original root node passed to the plugin, removing custom atrules,
@@ -95,19 +109,21 @@ function doDryRun (css: string) {
  * @param {bool} dryRun Do a dry run?
  * @param {string} filePath Path to write file to.
  * @param {Object} result PostCSS root object.
+ * @param {number} fsWriteRate minimum time between file writes
  * @return {Promise} Resolves with writeCriticalFile or doDryRun function call.
  */
 async function dryRunOrWriteFile (
   dryRun: boolean,
   filePath: string,
-  result: Object
+  result: Object,
+  fsWriteRate: number
 ): Promise<any> {
   const { css } = result
   if (dryRun) {
     doDryRun(css)
   } else {
     // Write file at a maximum of once ever 250ms
-    await limiter.schedule(
+    await createOrGetLimiter(fsWriteRate).schedule(
       writeCriticalFile,
       filePath,
       css
@@ -136,7 +152,6 @@ function hasNoOtherChildNodes (
  * @param {string} css CSS to write to file.
  */
 async function writeCriticalFile (filePath: string, css: string): Promise<any> {
-  console.log(`writeCriticalFile: ${filePath}`)
   try {
     await fs.outputFile(
       filePath,
@@ -173,9 +188,11 @@ function buildCritical (options: Object = {}): Function {
     minify: true,
     dryRun: false,
     ignoreSelectors: [],
+    fsWriteRate: 250,
     ...filteredOptions
   }
   append = false
+
   return async (css: Object): Object => {
     const { dryRun, preserve, minify, outputPath, outputDest } = args
     const criticalOutput = getCriticalRules(css, outputDest)
@@ -196,7 +213,7 @@ function buildCritical (options: Object = {}): Function {
       })
       result = await postcss(minify ? [cssnano] : [])
         .process(criticalCSS, { from: undefined })
-      await dryRunOrWriteFile(dryRun, filePath, result)
+      await dryRunOrWriteFile(dryRun, filePath, result, args.fsWriteRate)
       clean(css, preserve)
     }
 
