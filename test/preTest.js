@@ -65,7 +65,7 @@ module.exports = async function preTest(name, opts) {
   }
 
   try {
-    const files = await fs.readdirSync(opts.outputPath, 'utf8')
+    const files = await fs.readdir(opts.outputPath, 'utf8')
     await deleteOldFixtures(files, name, opts)
     await writeNewFixtures(files, name, opts)
   } catch(err) {

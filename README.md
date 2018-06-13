@@ -187,9 +187,10 @@ Will output:
 
 The plugin takes a single object as its only parameter. The following properties are valid:
 
-| Arg          | Type      | Description                                 | Default                   |
-| ------------ | --------- | ------------------------------------------- | ------------------------- |
-| `outputPath` | `string`  | Path to which critical CSS should be output | Current working directory |
-| `outputDest` | `string`  | Default critical CSS file name              | `"critical.css"`          |
-| `preserve`   | `boolean` | Whether or not to remove selectors from primary CSS document once they've been marked as critical. This should prevent duplication of selectors across critical and non-critical CSS. | `true` |
-| `minify`     | `boolean` | Minify output CSS?                          | `true` |
+| Arg               | Type      | Description                                 | Default                   |
+| ----------------- | --------- | ------------------------------------------- | ------------------------- |
+| `outputPath`      | `string`  | Path to which critical CSS should be output | Current working directory |
+| `outputDest`      | `string`  | Default critical CSS file name              | `"critical.css"`          |
+| `preserve`        | `boolean` | Whether or not to remove selectors from primary CSS document once they've been marked as critical. This should prevent duplication of selectors across critical and non-critical CSS. | `true` |
+| `minify`          | `boolean` | Minify output CSS?                          | `true` |
+| `ignoreSelectors` | `array`   | Array of selectors to globally exclude from critical CSS output | `[]` |
