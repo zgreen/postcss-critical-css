@@ -1,0 +1,12 @@
+.foo {
+  color: gold;
+  height: 100px;
+}
+
+@critical {
+
+  .bar {
+    color: tomato;
+    height: 200px;
+  }
+}

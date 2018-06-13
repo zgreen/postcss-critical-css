@@ -1,0 +1,14 @@
+.test-preserve {
+	color: red;
+	display: block;
+}
+
+.another-selector {
+		background-color: black;
+		color: white;
+	}
+
+.this-selector-stays {
+	display: flex;
+	justify-content: center;
+}

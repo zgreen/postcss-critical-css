@@ -1,7 +1,0 @@
-.foo {
-  color: limegreen;
-}
-
-.foo::before {
-  content: 'Hello, World.'
-}

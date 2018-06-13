@@ -1,0 +1,19 @@
+@media screen and (min-width: 1024px) {
+  .foo {
+    critical-selector: this;
+    display: flex;
+    width: calc(100% - 200px);
+  }
+
+  .bar {
+    border: 10px solid gold;
+    critical-selector: this;
+    height: 100%;
+  }
+
+  .baz::before {
+    content: 'test';
+    critical-selector: this;
+    position: fixed;
+  }
+}

@@ -3,14 +3,37 @@
 import { green, yellow } from 'chalk'
 import postcss from 'postcss'
 import cssnano from 'cssnano'
-import fs from 'fs'
+import fs from 'fs-extra'
 import path from 'path'
+import Bottleneck from 'bottleneck'
 import { getCriticalRules } from './getCriticalRules'
 
 /**
  * Append to an existing critical CSS file?
  */
 let append = false
+
+/**
+ * Instance of Bottleneck for rate-limiting file writes
+ */
+let limiter
+
+/**
+ * Create or get a "singleton" instance of Bottleneck
+ *
+ * @param {number} fsWriteRate minimum time between file writes
+ * @return {Bottleneck} instnance of Bottleneck
+ */
+function createOrGetLimiter (fsWriteRate: number): Bottleneck {
+  if (!limiter) {
+    limiter = new Bottleneck({
+      maxConcurrent: 1,
+      minTime: fsWriteRate
+    })
+  }
+
+  return limiter
+}
 
 /**
  * Clean the original root node passed to the plugin, removing custom atrules,
@@ -86,17 +109,26 @@ function doDryRun (css: string) {
  * @param {bool} dryRun Do a dry run?
  * @param {string} filePath Path to write file to.
  * @param {Object} result PostCSS root object.
+ * @param {number} fsWriteRate minimum time between file writes
  * @return {Promise} Resolves with writeCriticalFile or doDryRun function call.
  */
-function dryRunOrWriteFile (
+async function dryRunOrWriteFile (
   dryRun: boolean,
   filePath: string,
-  result: Object
+  result: Object,
+  fsWriteRate: number
 ): Promise<any> {
   const { css } = result
-  return new Promise((resolve: Function): void =>
-    resolve(dryRun ? doDryRun(css) : writeCriticalFile(filePath, css))
-  )
+  if (dryRun) {
+    doDryRun(css)
+  } else {
+    // Write file at a maximum of once ever 250ms
+    await createOrGetLimiter(fsWriteRate).schedule(
+      writeCriticalFile,
+      filePath,
+      css
+    )
+  }
 }
 
 /**
@@ -119,19 +151,20 @@ function hasNoOtherChildNodes (
  * @param {string} filePath Path to write file to.
  * @param {string} css CSS to write to file.
  */
-function writeCriticalFile (filePath: string, css: string) {
-  fs.writeFile(
-    filePath,
-    css,
-    { flag: append ? 'a' : 'w' },
-    (err: ?ErrnoError) => {
-      append = true
-      if (err) {
-        console.error(err)
-        process.exit(1)
-      }
+async function writeCriticalFile (filePath: string, css: string): Promise<any> {
+  try {
+    await fs.outputFile(
+      filePath,
+      css,
+      { flag: append ? 'a' : 'w' }
+    )
+    append = true
+  } catch (err) {
+    if (err) {
+      console.error(err)
+      process.exit(1)
     }
-  )
+  }
 }
 
 /**
@@ -154,26 +187,45 @@ function buildCritical (options: Object = {}): Function {
     preserve: true,
     minify: true,
     dryRun: false,
+    ignoreSelectors: [],
+    fsWriteRate: 250,
     ...filteredOptions
   }
   append = false
-  return (css: Object): Object => {
-    const { dryRun, preserve, minify, outputPath, outputDest } = args
+
+  return async (css: Object): Object => {
+    const {
+      dryRun,
+      preserve,
+      minify,
+      outputPath,
+      outputDest,
+      ignoreSelectors,
+      fsWriteRate
+    } = args
     const criticalOutput = getCriticalRules(css, outputDest)
-    return Object.keys(criticalOutput).reduce(
-      (init: Object, cur: string): Function => {
-        const criticalCSS = postcss.root()
-        const filePath = path.join(outputPath, cur)
-        criticalOutput[cur].each((rule: Object): Function =>
-          criticalCSS.append(rule.clone())
-        )
-        return postcss(minify ? [cssnano] : [])
-          .process(criticalCSS)
-          .then(dryRunOrWriteFile.bind(null, dryRun, filePath))
-          .then(clean.bind(null, css, preserve))
-      },
-      {}
-    )
+    let result = {}
+
+    for (let outputFile of Object.keys(criticalOutput)) {
+      const criticalCSS = postcss.root()
+      const filePath = path.join(outputPath, outputFile)
+      criticalOutput[outputFile].each((rule: Object): any => {
+        // Check if we should remove this selector from output
+        const shouldIgnore = rule.selector && ignoreSelectors
+          .some((ignore: string): boolean => rule.selector.includes(ignore))
+        if (shouldIgnore) {
+          return
+        }
+
+        return criticalCSS.append(rule.clone())
+      })
+      result = await postcss(minify ? [cssnano] : [])
+        .process(criticalCSS, { from: undefined })
+      await dryRunOrWriteFile(dryRun, filePath, result, fsWriteRate)
+      clean(css, preserve)
+    }
+
+    return result
   }
 }
 

@@ -1,0 +1,6 @@
+.test-minify {
+	color: blue;
+	critical-selector: this;
+	critical-filename: minify-false.critical.actual.css;
+	font-style: italic;
+}
