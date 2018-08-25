@@ -42,23 +42,17 @@
     "eslint": "eslint test/**/*.js && eslint src/**",
     "start": "eslint src/** && npm run flow && babel src --out-dir lib --watch",
     "pretest": "./node_modules/.bin/babel-node test/preTest.js",
-    "test":
-      "npm run build && npm run test-default && npm run test-no-preserve && npm run test-output-path && npm run test-output-dest && npm run test-no-args && npm run test-no-minify",
-    "test-no-args":
-      "npm run pretest -- --noArgs && tape test --noArgs --test=default",
-    "test-no-minify":
-      "npm run pretest -- --minify=false --fixtures-dir=fixtures-no-minify && tape test --fixtures-dir=fixtures-no-minify --test=default,this",
-    "test-output-dest":
-      "npm run pretest -- --outputDest='custom.css' --fixtures-dir=fixtures-output-dest && tape test --outputDest='custom.css' --fixtures-dir=fixtures-output-dest --test=default",
+    "test": "npm run build && npm run test-default && npm run test-no-preserve && npm run test-output-path && npm run test-output-dest && npm run test-no-args && npm run test-no-minify",
+    "test-no-args": "npm run pretest -- --noArgs && tape test --noArgs --test=default",
+    "test-no-minify": "npm run pretest -- --minify=false --fixtures-dir=fixtures-no-minify && tape test --fixtures-dir=fixtures-no-minify --test=default,this",
+    "test-output-dest": "npm run pretest -- --outputDest='custom.css' --fixtures-dir=fixtures-output-dest && tape test --outputDest='custom.css' --fixtures-dir=fixtures-output-dest --test=default",
     "test-default": "npm run pretest && tape test",
-    "test-no-preserve":
-      "npm run pretest -- --fixtures-dir=fixtures-no-preserve --preserve=false && tape test --fixtures-dir=fixtures-no-preserve --preserve=false",
-    "test-output-path":
-      "npm run pretest -- --outputPath='test/fixtures-output-path' && tape test --outputPath='test/fixtures-output-path' --test=default"
+    "test-no-preserve": "npm run pretest -- --fixtures-dir=fixtures-no-preserve --preserve=false && tape test --fixtures-dir=fixtures-no-preserve --preserve=false",
+    "test-output-path": "npm run pretest -- --outputPath='test/fixtures-output-path' && tape test --outputPath='test/fixtures-output-path' --test=default"
   },
   "dependencies": {
     "chalk": "^1.1.3",
-    "cssnano": "^3.7.4",
-    "postcss": "^6.0.16"
+    "cssnano": "^4.0.0",
+    "postcss": "^7.0.0"
   }
 }
