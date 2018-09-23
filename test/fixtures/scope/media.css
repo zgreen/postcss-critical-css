@@ -1,0 +1,10 @@
+header.top {
+  critical-filename: media.critical.actual.css;
+  critical-selector: scope;
+  background: red;
+}
+@media screen and (max-width: 400px) {
+  header.top {
+    width: 100%;
+  }
+}

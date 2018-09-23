@@ -1,0 +1,5 @@
+.test-output-dest {
+	color: blue;
+	critical-selector: this;
+	font-family: Times;
+}
