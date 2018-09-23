@@ -94,8 +94,9 @@ function dryRunOrWriteFile (
   result: Object
 ): Promise<any> {
   const { css } = result
-  return new Promise((resolve: Function): void =>
-    resolve(dryRun ? doDryRun(css) : writeCriticalFile(filePath, css))
+  return new Promise(
+    (resolve: Function): void =>
+      resolve(dryRun ? doDryRun(css) : writeCriticalFile(filePath, css))
   )
 }
 
@@ -164,13 +165,19 @@ function buildCritical (options: Object = {}): Function {
       (init: Object, cur: string): Function => {
         const criticalCSS = postcss.root()
         const filePath = path.join(outputPath, cur)
-        criticalOutput[cur].each((rule: Object): Function =>
-          criticalCSS.append(rule.clone())
+        criticalOutput[cur].each(
+          (rule: Object): Function => criticalCSS.append(rule.clone())
         )
-        return postcss(minify ? [cssnano] : [])
-          .process(criticalCSS)
-          .then(dryRunOrWriteFile.bind(null, dryRun, filePath))
-          .then(clean.bind(null, css, preserve))
+        return (
+          postcss(minify ? [cssnano] : [])
+            // @TODO Use from/to correctly.
+            .process(criticalCSS, {
+              from: undefined,
+              to: undefined
+            })
+            .then(dryRunOrWriteFile.bind(null, dryRun, filePath))
+            .then(clean.bind(null, css, preserve))
+        )
       },
       {}
     )
