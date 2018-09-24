@@ -10,7 +10,7 @@ import { getCriticalDestination } from './getCriticalDestination'
  *
  * @param {Object} root PostCSS root node.
  * @param {string} test Declaration string. Default  `critical-selector`
- * @return {Object} clone Cloned, cleaned root node.
+ * @return {Object} Cloned, cleaned root node.
  */
 function clean (root: Object, test: string = 'critical-selector'): Object {
   const clone = root.clone()
@@ -98,9 +98,8 @@ function updateCritical (root: Object, update: Object): Object {
 /**
  * Identify critical CSS selectors
  *
- * @param {object} PostCSS CSS object.
- * @param {boolean} Whether or not to remove selectors from primary CSS document.
- * @param {string} Default output CSS file name.
+ * @param {object} css PostCSS CSS object.
+ * @param {string} defaultDest Default output CSS file name.
  * @return {object} Object containing critical rules, organized by output destination
  */
 export function getCriticalRules (css: Object, defaultDest: string): Object {

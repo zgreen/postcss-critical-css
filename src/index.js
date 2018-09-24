@@ -160,9 +160,9 @@ function buildCritical (options: Object = {}): Function {
   append = false
   return (css: Object): Object => {
     const { dryRun, preserve, minify, outputPath, outputDest } = args
-    const criticalOutput = getCriticalRules(css, outputDest)
+    const criticalOutput: Object = getCriticalRules(css, outputDest)
     return Object.keys(criticalOutput).reduce(
-      (init: Object, cur: string): Function => {
+      (init: Object, cur: string): Promise<any> => {
         const criticalCSS = postcss.root()
         const filePath = path.join(outputPath, cur)
         criticalOutput[cur].each(

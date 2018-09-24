@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 const fs = require('fs')
 const { bold, red } = require('chalk')
 const postcssCriticalCSS = require('..')
