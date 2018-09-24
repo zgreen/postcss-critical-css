@@ -160,16 +160,22 @@ function buildCritical (options: Object = {}): Function {
     ...filteredOptions
   }
   append = false
-  return (css: Object): Object => {
+  return (css: Object, result: Object): Object => {
     const { dryRun, preserve, minify, outputPath, outputDest } = args
     const criticalOutput = getCriticalRules(css, outputDest)
+    result.messages.push({
+      plugin: pluginName,
+      type: 'critical-css',
+      criticalOutput
+    })
     return Object.keys(criticalOutput).reduce(
-      (init: Object, cur: string): Function => {
+      (init: Object, key: string): Function => {
         const criticalCSS = postcss.root()
-        const filePath = path.join(outputPath, cur)
-        criticalOutput[cur].each(
+        const filePath = path.join(outputPath, key)
+        criticalOutput[key].each(
           (rule: Object): Function => criticalCSS.append(rule.clone())
         )
+        console.log(result)
         return (
           postcss(minify ? [cssnano] : [])
             // @TODO Use from/to correctly.
