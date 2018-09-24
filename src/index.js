@@ -7,6 +7,8 @@ import fs from 'fs'
 import path from 'path'
 import { getCriticalRules } from './getCriticalRules'
 
+const pluginName = 'postcss-critical-css'
+
 /**
  * Append to an existing critical CSS file?
  */
@@ -184,4 +186,4 @@ function buildCritical (options: Object = {}): Function {
   }
 }
 
-module.exports = postcss.plugin('postcss-critical', buildCritical)
+module.exports = postcss.plugin(pluginName, buildCritical)
