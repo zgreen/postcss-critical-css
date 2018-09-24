@@ -175,7 +175,6 @@ function buildCritical (options: Object = {}): Function {
         criticalOutput[key].each(
           (rule: Object): Function => criticalCSS.append(rule.clone())
         )
-        console.log(result)
         return (
           postcss(minify ? [cssnano] : [])
             // @TODO Use from/to correctly.
