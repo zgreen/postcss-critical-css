@@ -172,8 +172,7 @@ function buildCritical (options: Object = {}): Function {
           postcss(minify ? [cssnano] : [])
             // @TODO Use from/to correctly.
             .process(criticalCSS, {
-              from: undefined,
-              to: undefined
+              from: undefined
             })
             .then(dryRunOrWriteFile.bind(null, dryRun, filePath))
             .then(clean.bind(null, css, preserve))

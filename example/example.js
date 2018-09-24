@@ -8,7 +8,7 @@ const basePath = `${process.cwd()}/example`
 function cb (files) {
   function useFileData (data, file) {
     postcss([postcssCriticalCSS({ outputPath: basePath })])
-      .process(data, { from: undefined, to: undefined })
+      .process(data, { from: undefined })
       .then(result => {
         fs.writeFile(
           `${basePath}/${file.split('.')[0]}.non-critical.css`,
