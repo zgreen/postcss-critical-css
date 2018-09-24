@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 var fs = require('fs')
 var test = require('tape')
 var postcss = require('postcss')
