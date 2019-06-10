@@ -31,7 +31,7 @@
     "eslint-plugin-node": "^4.2.3",
     "eslint-plugin-promise": "^3.8.0",
     "eslint-plugin-standard": "^3.1.0",
-    "flow-bin": "^0.48.0",
+    "flow-bin": "^0.100.0",
     "minimist": "^1.2.0",
     "tape": "^4.10.2"
   },
