@@ -36,7 +36,7 @@
     "tape": "^4.10.2"
   },
   "scripts": {
-    "build": "eslint src/** && npm run flow && babel src --out-dir lib",
+    "build": "babel src --out-dir lib",
     "example": "./node_modules/.bin/babel-node example/example.js",
     "flow": "flow; test $? -eq 0 -o $? -eq 2",
     "eslint": "eslint test/**/*.js && eslint src/**",
