@@ -3,7 +3,7 @@
 import { green, yellow } from 'chalk'
 import postcss from 'postcss'
 import cssnano from 'cssnano'
-import fs from 'fs'
+import fs from 'fs-extra'
 import path from 'path'
 import { getCriticalRules } from './getCriticalRules'
 
@@ -120,8 +120,8 @@ function hasNoOtherChildNodes (
  * @param {string} filePath Path to write file to.
  * @param {string} css CSS to write to file.
  */
-function writeCriticalFile (filePath: string, css: string) {
-  fs.writeFile(
+function writeCriticalFile(filePath: string, css: string) {
+  fs.outputFile(
     filePath,
     css,
     { flag: append ? 'a' : 'w' },
