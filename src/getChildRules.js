@@ -1,5 +1,3 @@
-// @flow
-
 import postcss from 'postcss'
 import { matchChild } from './matchChild'
 
@@ -10,12 +8,12 @@ import { matchChild } from './matchChild'
  * @param {Object} Parent rule for which children should be included
  * @return {array} Array of child rules.
  */
-export function getChildRules (css: Object, parent: Object): Array<Object> {
+export function getChildRules (css, parent) {
   const result = []
-  const selectorRegExp: Object = new RegExp(parent.selector)
+  const selectorRegExp = new RegExp(parent.selector)
 
   // Walk all rules to mach child selectors
-  css.walkRules(selectorRegExp, (rule: Object) => {
+  css.walkRules(selectorRegExp, (rule) => {
     const childRule = matchChild(parent, rule)
     if (childRule) {
       result.push(rule)
@@ -23,8 +21,8 @@ export function getChildRules (css: Object, parent: Object): Array<Object> {
   })
 
   // Walk all at-rules to match nested child selectors
-  css.walkAtRules((atRule: Object) => {
-    atRule.walkRules(selectorRegExp, (rule: Object) => {
+  css.walkAtRules((atRule) => {
+    atRule.walkRules(selectorRegExp, (rule) => {
       const childRule = matchChild(parent, rule)
       // Create new at-rule to append only necessary selector to critical
       const criticalAtRule = postcss.atRule({

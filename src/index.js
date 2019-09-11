@@ -1,9 +1,7 @@
-// @flow
-
 import { green, yellow } from 'chalk'
 import postcss from 'postcss'
 import cssnano from 'cssnano'
-import fs from 'fs'
+import fs from 'fs-extra'
 import path from 'path'
 import { getCriticalRules } from './getCriticalRules'
 
@@ -20,8 +18,8 @@ let append = false
  * @param {Object} root The root PostCSS object.
  * @param {boolean} preserve Preserve identified critical CSS in the root?
  */
-function clean (root: Object, preserve: boolean) {
-  root.walkAtRules('critical', (atRule: Object) => {
+function clean(root, preserve) {
+  root.walkAtRules('critical', (atRule) => {
     if (preserve === false) {
       if (atRule.nodes && atRule.nodes.length) {
         atRule.remove()
@@ -37,10 +35,10 @@ function clean (root: Object, preserve: boolean) {
     }
   })
   // @TODO `scope` Makes this kind of gnarly. This could be cleaned up a bit.
-  root.walkDecls(/critical-(selector|filename)/, (decl: Object) => {
+  root.walkDecls(/critical-(selector|filename)/, (decl) => {
     if (preserve === false) {
       if (decl.value === 'scope') {
-        root.walk((node: Object) => {
+        root.walk((node) => {
           if (
             node.selector &&
             node.selector.indexOf(decl.parent.selector) === 0
@@ -73,7 +71,7 @@ function clean (root: Object, preserve: boolean) {
  *
  * @param {string} css CSS to output.
  */
-function doDryRun (css: string) {
+function doDryRun(css) {
   console.log(
     // eslint-disable-line no-console
     green(`Critical CSS result is: ${yellow(css)}`)
@@ -88,14 +86,14 @@ function doDryRun (css: string) {
  * @param {Object} result PostCSS root object.
  * @return {Promise} Resolves with writeCriticalFile or doDryRun function call.
  */
-function dryRunOrWriteFile (
-  dryRun: boolean,
-  filePath: string,
-  result: Object
-): Promise<any> {
+function dryRunOrWriteFile(
+  dryRun,
+  filePath,
+  result
+) {
   const { css } = result
   return new Promise(
-    (resolve: Function): void =>
+    (resolve) =>
       resolve(dryRun ? doDryRun(css) : writeCriticalFile(filePath, css))
   )
 }
@@ -107,11 +105,11 @@ function dryRunOrWriteFile (
  * @param {Object} node Node to check.
  * @return {boolean} Whether or not the node has no other children.
  */
-function hasNoOtherChildNodes (
-  nodes: Array<Object> = [],
-  node: Object = postcss.root()
-): boolean {
-  return nodes.filter((child: Object): boolean => child !== node).length === 0
+function hasNoOtherChildNodes(
+  nodes = [],
+  node = postcss.root()
+) {
+  return nodes.filter((child) => child !== node).length === 0
 }
 
 /**
@@ -120,12 +118,12 @@ function hasNoOtherChildNodes (
  * @param {string} filePath Path to write file to.
  * @param {string} css CSS to write to file.
  */
-function writeCriticalFile (filePath: string, css: string) {
-  fs.writeFile(
+function writeCriticalFile(filePath, css) {
+  fs.outputFile(
     filePath,
     css,
     { flag: append ? 'a' : 'w' },
-    (err: ?ErrnoError) => {
+    (err) => {
       append = true
       if (err) {
         console.error(err)
@@ -141,9 +139,9 @@ function writeCriticalFile (filePath: string, css: string) {
  * @param {object} options Object of function args.
  * @return {function} function for PostCSS plugin.
  */
-function buildCritical (options: Object = {}): Function {
+function buildCritical(options = {}) {
   const filteredOptions = Object.keys(options).reduce(
-    (acc: Object, key: string): Object =>
+    (acc, key) =>
       typeof options[key] !== 'undefined'
         ? { ...acc, [key]: options[key] }
         : acc,
@@ -158,15 +156,15 @@ function buildCritical (options: Object = {}): Function {
     ...filteredOptions
   }
   append = false
-  return (css: Object): Object => {
+  return (css) => {
     const { dryRun, preserve, minify, outputPath, outputDest } = args
     const criticalOutput = getCriticalRules(css, outputDest)
     return Object.keys(criticalOutput).reduce(
-      (init: Object, cur: string): Function => {
+      (init, cur) => {
         const criticalCSS = postcss.root()
         const filePath = path.join(outputPath, cur)
         criticalOutput[cur].each(
-          (rule: Object): Function => criticalCSS.append(rule.clone())
+          (rule) => criticalCSS.append(rule.clone())
         )
         return (
           postcss(minify ? [cssnano] : [])
