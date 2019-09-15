@@ -3,7 +3,7 @@
 import { green, yellow } from 'chalk'
 import postcss from 'postcss'
 import cssnano from 'cssnano'
-import fs from 'fs'
+import fs from 'fs-extra'
 import path from 'path'
 import { getCriticalRules } from './getCriticalRules'
 
@@ -94,9 +94,8 @@ function dryRunOrWriteFile (
   result: Object
 ): Promise<any> {
   const { css } = result
-  return new Promise(
-    (resolve: Function): void =>
-      resolve(dryRun ? doDryRun(css) : writeCriticalFile(filePath, css))
+  return new Promise((resolve: Function): void =>
+    resolve(dryRun ? doDryRun(css) : writeCriticalFile(filePath, css))
   )
 }
 
@@ -121,7 +120,7 @@ function hasNoOtherChildNodes (
  * @param {string} css CSS to write to file.
  */
 function writeCriticalFile (filePath: string, css: string) {
-  fs.writeFile(
+  fs.outputFile(
     filePath,
     css,
     { flag: append ? 'a' : 'w' },
@@ -165,8 +164,8 @@ function buildCritical (options: Object = {}): Function {
       (init: Object, cur: string): Function => {
         const criticalCSS = postcss.root()
         const filePath = path.join(outputPath, cur)
-        criticalOutput[cur].each(
-          (rule: Object): Function => criticalCSS.append(rule.clone())
+        criticalOutput[cur].each((rule: Object): Function =>
+          criticalCSS.append(rule.clone())
         )
         return (
           postcss(minify ? [cssnano] : [])
