@@ -6,8 +6,10 @@
  * @param {obj} PostCSS CSS object
  * @return {object} Parent rule for which children should be included
  */
-export function matchChild (parent: Object, rule: Object): boolean {
-  const childRegExp = new RegExp(`(, )?(${parent.selector} [^,\s]*),?.*`) // eslint-disable-line no-useless-escape
-  return rule.selector !== parent.selector &&
+export function matchChild(parent: Object, rule: Object): boolean {
+  const childRegExp = new RegExp(`(, )?(${parent.selector} [^,\s]*),?.*`); // eslint-disable-line no-useless-escape
+  return (
+    rule.selector !== parent.selector &&
     rule.selector.match(childRegExp) !== null
+  );
 }
