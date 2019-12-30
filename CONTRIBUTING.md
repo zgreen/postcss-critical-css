@@ -29,7 +29,11 @@ You can test your code locally using the following command:
 npm run test
 ```
 
-To ensure proper versioning, commits to are also linted using [commitlint](https://commitlint.js.org).
+## Commits
+
+To ensure proper versioning, commits to are linted using [commitlint](https://commitlint.js.org).
+
+[prettier](https://prettier.io/) is run via a hook on every commit.
 
 ## Building
 
