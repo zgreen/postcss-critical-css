@@ -44,12 +44,11 @@
     "tape": "^4.12.1"
   },
   "scripts": {
-    "build": "eslint src/** && npm run flow && babel src --out-dir lib",
+    "build": "eslint src/** && npm run flow && babel src --out-dir dist",
     "example": "./node_modules/.bin/babel-node example/example.js",
     "flow": "flow; test $? -eq 0 -o $? -eq 2",
     "eslint": "eslint test/**/*.js && eslint src/**",
     "format": "prettier --write \"**/*.{js,md,yml,.babelrc,.eslintrc}\"",
-    "start": "eslint src/** && npm run flow && babel src --out-dir lib --watch",
     "prerelease": "npm run build && npm test",
     "pretest": "./node_modules/.bin/babel-node test/preTest.js",
     "release": "standard-version",
