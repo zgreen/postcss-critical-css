@@ -50,6 +50,7 @@
     "eslint": "eslint test/**/*.js && eslint src/**",
     "format": "prettier --write \"**/*.{js,md,yml,.babelrc,.eslintrc}\"",
     "start": "eslint src/** && npm run flow && babel src --out-dir lib --watch",
+    "prerelease": "npm run build && npm test",
     "pretest": "./node_modules/.bin/babel-node test/preTest.js",
     "release": "standard-version",
     "test": "npm run test-default && npm run test-no-preserve && npm run test-output-path && npm run test-output-dest && npm run test-no-args && npm run test-no-minify",
