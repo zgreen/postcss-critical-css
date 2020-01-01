@@ -1,10 +1,10 @@
 // @flow
 
-import { green, yellow } from "chalk";
-import postcss from "postcss";
+import chalk from "chalk";
+import * as postcss from "postcss";
 import cssnano from "cssnano";
 import fs from "fs-extra";
-import path from "path";
+import * as path from "path";
 import { getCriticalRules } from "./getCriticalRules";
 
 /**
@@ -20,8 +20,8 @@ let append = false;
  * @param {Object} root The root PostCSS object.
  * @param {boolean} preserve Preserve identified critical CSS in the root?
  */
-function clean(root: Object, preserve: boolean) {
-  root.walkAtRules("critical", (atRule: Object) => {
+function clean(root: postcss.Root, preserve: boolean) {
+  root.walkAtRules("critical", (atRule: postcss.AtRule) => {
     if (preserve === false) {
       if (atRule.nodes && atRule.nodes.length) {
         atRule.remove();
@@ -36,36 +36,23 @@ function clean(root: Object, preserve: boolean) {
       }
     }
   });
-  // @TODO `scope` Makes this kind of gnarly. This could be cleaned up a bit.
-  root.walkDecls(/critical-(selector|filename)/, (decl: Object) => {
-    if (preserve === false) {
-      if (decl.value === "scope") {
-        root.walk((node: Object) => {
-          if (
-            node.selector &&
-            node.selector.indexOf(decl.parent.selector) === 0
-          ) {
-            if (node.parent && hasNoOtherChildNodes(node.parent.nodes, node)) {
-              node.parent.remove();
-            } else {
-              node.remove();
-            }
-          }
-        });
+  root.walkDecls(
+    /critical-(selector|filename)/,
+    (decl: postcss.Declaration) => {
+      if (!preserve) {
+        decl.remove();
+        return;
       }
-      let wrapper = {};
       if (decl && decl.parent) {
-        wrapper = decl.parent.parent;
-        decl.parent.remove();
+        const { parent } = decl;
+        parent.remove();
+        // If the wrapper has no valid child nodes, remove it entirely.
+        if (parent.parent && hasNoOtherChildNodes(parent.parent, decl)) {
+          parent.parent.remove();
+        }
       }
-      // If the wrapper has no valid child nodes, remove it entirely.
-      if (wrapper && hasNoOtherChildNodes(wrapper.nodes, decl)) {
-        wrapper.remove();
-      }
-    } else {
-      decl.remove();
     }
-  });
+  );
 }
 
 /**
@@ -76,7 +63,7 @@ function clean(root: Object, preserve: boolean) {
 function doDryRun(css: string) {
   console.log(
     // eslint-disable-line no-console
-    green(`Critical CSS result is: ${yellow(css)}`)
+    chalk.green(`Critical CSS result is: ${chalk.yellow(css)}`)
   );
 }
 
@@ -91,7 +78,7 @@ function doDryRun(css: string) {
 function dryRunOrWriteFile(
   dryRun: boolean,
   filePath: string,
-  result: Object
+  result: postcss.Result
 ): Promise<any> {
   const { css } = result;
   return new Promise((resolve: Function): void =>
@@ -107,10 +94,15 @@ function dryRunOrWriteFile(
  * @return {boolean} Whether or not the node has no other children.
  */
 function hasNoOtherChildNodes(
-  nodes: Array<Object> = [],
+  nodes: postcss.Container,
   node: Object = postcss.root()
-): boolean {
-  return nodes.filter((child: Object): boolean => child !== node).length === 0;
+): boolean | void {
+  return nodes.each((n: postcss.Node): boolean => {
+    if (n !== node) {
+      return false;
+    }
+    return true;
+  });
 }
 
 /**
@@ -120,18 +112,13 @@ function hasNoOtherChildNodes(
  * @param {string} css CSS to write to file.
  */
 function writeCriticalFile(filePath: string, css: string) {
-  fs.outputFile(
-    filePath,
-    css,
-    { flag: append ? "a" : "w" },
-    (err: ?ErrnoError) => {
-      append = true;
-      if (err) {
-        console.error(err);
-        process.exit(1);
-      }
+  fs.outputFile(filePath, css, { flag: append ? "a" : "w" }, err => {
+    append = true;
+    if (err) {
+      console.error(err);
+      process.exit(1);
     }
-  );
+  });
 }
 
 /**
@@ -140,7 +127,7 @@ function writeCriticalFile(filePath: string, css: string) {
  * @param {object} options Object of function args.
  * @return {function} function for PostCSS plugin.
  */
-function buildCritical(options: Object = {}): Function {
+function buildCritical(options: Object = {}) {
   const filteredOptions = Object.keys(options).reduce(
     (acc: Object, key: string): Object =>
       typeof options[key] !== "undefined"
@@ -160,25 +147,24 @@ function buildCritical(options: Object = {}): Function {
   return (css: Object): Object => {
     const { dryRun, preserve, minify, outputPath, outputDest } = args;
     const criticalOutput = getCriticalRules(css, outputDest);
-    return Object.keys(criticalOutput).reduce(
-      (init: Object, cur: string): Function => {
-        const criticalCSS = postcss.root();
-        const filePath = path.join(outputPath, cur);
-        criticalOutput[cur].each((rule: Object): Function =>
-          criticalCSS.append(rule.clone())
-        );
-        return (
-          postcss(minify ? [cssnano] : [])
-            // @TODO Use from/to correctly.
-            .process(criticalCSS, {
-              from: undefined
-            })
-            .then(dryRunOrWriteFile.bind(null, dryRun, filePath))
-            .then(clean.bind(null, css, preserve))
-        );
-      },
-      {}
-    );
+    return Object.keys(criticalOutput).reduce((_, cur: string): Promise<
+      Function
+    > => {
+      const criticalCSS = postcss.root();
+      const filePath = path.join(outputPath, cur);
+      criticalOutput[cur].each((rule: postcss.Rule) =>
+        criticalCSS.append(rule.clone())
+      );
+      return (
+        postcss(minify ? [cssnano] : [])
+          // @TODO Use from/to correctly.
+          .process(criticalCSS, {
+            from: undefined
+          })
+          .then(dryRunOrWriteFile.bind(null, dryRun, filePath))
+          .then(clean.bind(null, css, preserve))
+      );
+    }, {});
   };
 }
 

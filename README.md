@@ -160,25 +160,6 @@ Will output:
 }
 ```
 
-### Using the custom property, `critical-selector`, with value `scope`
-
-This allows the user to output the entire scope of a module, including children.
-
-```css
-/* in foo.css */
-.foo {
-  critical-selector: scope;
-  border: 3px solid gray;
-  display: flex;
-  padding: 1em;
-}
-
-.foo a {
-  color: blue;
-  text-decoration: none;
-}
-```
-
 Will output:
 
 ```css
