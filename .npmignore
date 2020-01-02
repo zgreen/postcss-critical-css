@@ -1,0 +1,8 @@
+*
+!dist/**/*
+!CHANGELOG.md
+!CONTRIBUTING.md
+!index.js
+!package.json
+!package-lock.json
+!README.md

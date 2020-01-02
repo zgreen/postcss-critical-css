@@ -1,9 +1,9 @@
 // @flow
 
-import postcss from 'postcss'
-import { getChildRules } from './getChildRules'
-import { getCriticalFromAtRule } from './atRule'
-import { getCriticalDestination } from './getCriticalDestination'
+import postcss from "postcss";
+import { getChildRules } from "./getChildRules";
+import { getCriticalFromAtRule } from "./atRule";
+import { getCriticalDestination } from "./getCriticalDestination";
 
 /**
  * Clean a root node of a declaration.
@@ -12,16 +12,16 @@ import { getCriticalDestination } from './getCriticalDestination'
  * @param {string} test Declaration string. Default  `critical-selector`
  * @return {Object} clone Cloned, cleaned root node.
  */
-function clean (root: Object, test: string = 'critical-selector'): Object {
-  const clone = root.clone()
-  if (clone.type === 'decl') {
-    clone.remove()
+function clean(root: Object, test: string = "critical-selector"): Object {
+  const clone = root.clone();
+  if (clone.type === "decl") {
+    clone.remove();
   } else {
     clone.walkDecls(test, (decl: Object) => {
-      decl.remove()
-    })
+      decl.remove();
+    });
   }
-  return clone
+  return clone;
 }
 
 /**
@@ -30,32 +30,32 @@ function clean (root: Object, test: string = 'critical-selector'): Object {
  * @param {Object} root PostCSS root node.
  * @return {Object} sortedRoot Root with nodes sorted by source order.
  */
-function correctSourceOrder (root: Object): Object {
-  const sortedRoot = postcss.root()
-  const clone = root.clone()
+function correctSourceOrder(root: Object): Object {
+  const sortedRoot = postcss.root();
+  const clone = root.clone();
   clone.walkRules((rule: Object) => {
-    let start = rule.source.start.line
-    if (rule.parent.type === 'atrule') {
-      const child = rule
+    let start = rule.source.start.line;
+    if (rule.parent.type === "atrule") {
+      const child = rule;
       rule = postcss
         .atRule({
           name: rule.parent.name,
           params: rule.parent.params
         })
-        .append(rule.clone())
-      rule.source = child.source
-      start = child.source.start.line
+        .append(rule.clone());
+      rule.source = child.source;
+      start = child.source.start.line;
     }
     if (
       sortedRoot.nodes.length === 0 ||
       (sortedRoot.last && sortedRoot.last.source.start.line > start)
     ) {
-      sortedRoot.prepend(rule)
+      sortedRoot.prepend(rule);
     } else {
-      sortedRoot.append(rule)
+      sortedRoot.append(rule);
     }
-  })
-  return sortedRoot
+  });
+  return sortedRoot;
 }
 
 /**
@@ -65,15 +65,15 @@ function correctSourceOrder (root: Object): Object {
  * @param {Object} node PostCSS node.
  * @return {Object} A new root node with an atrule at its base.
  */
-function establishContainer (node: Object): Object {
-  return node.parent.type === 'atrule' && node.parent.name !== 'critical'
+function establishContainer(node: Object): Object {
+  return node.parent.type === "atrule" && node.parent.name !== "critical"
     ? postcss.atRule({
-      name: node.parent.name,
-      type: node.parent.type,
-      params: node.parent.params,
-      nodes: [node]
-    })
-    : node.clone()
+        name: node.parent.name,
+        type: node.parent.type,
+        params: node.parent.params,
+        nodes: [node]
+      })
+    : node.clone();
 }
 
 /**
@@ -83,16 +83,16 @@ function establishContainer (node: Object): Object {
  * @param {Object} update Update object.
  * @return {Object} clonedRoot Root object.
  */
-function updateCritical (root: Object, update: Object): Object {
-  const clonedRoot = root.clone()
-  if (update.type === 'rule') {
-    clonedRoot.append(clean(update.clone()))
+function updateCritical(root: Object, update: Object): Object {
+  const clonedRoot = root.clone();
+  if (update.type === "rule") {
+    clonedRoot.append(clean(update.clone()));
   } else {
     update.clone().each((rule: Object) => {
-      clonedRoot.append(clean(rule.root()))
-    })
+      clonedRoot.append(clean(rule.root()));
+    });
   }
-  return clonedRoot
+  return clonedRoot;
 }
 
 /**
@@ -103,33 +103,33 @@ function updateCritical (root: Object, update: Object): Object {
  * @param {string} Default output CSS file name.
  * @return {object} Object containing critical rules, organized by output destination
  */
-export function getCriticalRules (css: Object, defaultDest: string): Object {
-  const critical: Object = getCriticalFromAtRule({ css, defaultDest })
-  css.walkDecls('critical-selector', (decl: Object) => {
-    const { parent, value } = decl
-    const dest = getCriticalDestination(parent, defaultDest)
-    const container = establishContainer(parent)
-    const childRules = value === 'scope' ? getChildRules(css, parent) : []
+export function getCriticalRules(css: Object, defaultDest: string): Object {
+  const critical: Object = getCriticalFromAtRule({ css, defaultDest });
+  css.walkDecls("critical-selector", (decl: Object) => {
+    const { parent, value } = decl;
+    const dest = getCriticalDestination(parent, defaultDest);
+    const container = establishContainer(parent);
+    const childRules = value === "scope" ? getChildRules(css, parent) : [];
     // Sanity check, make sure we've got a root node
-    critical[dest] = critical[dest] || postcss.root()
+    critical[dest] = critical[dest] || postcss.root();
 
     switch (value) {
-      case 'scope':
+      case "scope":
         // Add all child rules
         const criticalRoot = childRules.reduce(
           (acc: Object, rule: Object): Object => {
-            return acc.append(rule.clone())
+            return acc.append(rule.clone());
           },
           critical[dest].append(container)
-        )
+        );
 
-        critical[dest] = clean(correctSourceOrder(criticalRoot))
-        break
+        critical[dest] = clean(correctSourceOrder(criticalRoot));
+        break;
 
       default:
-        critical[dest] = updateCritical(critical[dest], container)
-        break
+        critical[dest] = updateCritical(critical[dest], container);
+        break;
     }
-  })
-  return critical
+  });
+  return critical;
 }

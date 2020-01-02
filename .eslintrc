@@ -1,8 +1,6 @@
 {
-  "extends": "standard",
-  "plugins": [
-    "flowtype"
-  ],
+  "extends": ["standard", "plugin:prettier/recommended"],
+  "plugins": ["flowtype"],
   "parser": "babel-eslint",
   "rules": {
     "flowtype/define-flow-type": 1,
@@ -11,21 +9,12 @@
       1,
       "always",
       {
-      "annotateUndefined": "never"
+        "annotateUndefined": "never"
       }
     ],
-    "flowtype/space-after-type-colon": [
-      1,
-      "always"
-    ],
-    "flowtype/space-before-type-colon": [
-      1,
-      "never"
-    ],
-    "flowtype/type-id-match": [
-      1,
-      "^([A-Z][a-z0-9]+)+Type$"
-    ],
+    "flowtype/space-after-type-colon": [1, "always"],
+    "flowtype/space-before-type-colon": [1, "never"],
+    "flowtype/type-id-match": [1, "^([A-Z][a-z0-9]+)+Type$"],
     "flowtype/use-flow-type": 1,
     "flowtype/valid-syntax": 1,
     "import/prefer-default-export": 0
