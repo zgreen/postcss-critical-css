@@ -1,39 +1,23 @@
-// @flow
-
-import postcss from "postcss";
+import * as postcss from "postcss";
 import { getChildRules } from "./getChildRules";
 import { getCriticalFromAtRule } from "./atRule";
 import { getCriticalDestination } from "./getCriticalDestination";
 
-/**
- * Clean a root node of a declaration.
- *
- * @param {Object} root PostCSS root node.
- * @param {string} test Declaration string. Default  `critical-selector`
- * @return {Object} clone Cloned, cleaned root node.
- */
-function clean(root: Object, test: string = "critical-selector"): Object {
+function clean(
+  root: postcss.Root,
+  test: string = "critical-selector"
+): postcss.Root {
   const clone = root.clone();
-  if (clone.type === "decl") {
-    clone.remove();
-  } else {
-    clone.walkDecls(test, (decl: Object) => {
-      decl.remove();
-    });
-  }
+  clone.walkDecls(test, (decl: postcss.Declaration) => {
+    decl.remove();
+  });
   return clone;
 }
 
-/**
- * Correct the source order of nodes in a root.
- *
- * @param {Object} root PostCSS root node.
- * @return {Object} sortedRoot Root with nodes sorted by source order.
- */
-function correctSourceOrder(root: Object): Object {
+function correctSourceOrder(root: postcss.Root): Object {
   const sortedRoot = postcss.root();
   const clone = root.clone();
-  clone.walkRules((rule: Object) => {
+  clone.walkRules((rule: postcss.Rule) => {
     let start = rule.source.start.line;
     if (rule.parent.type === "atrule") {
       const child = rule;
@@ -58,14 +42,7 @@ function correctSourceOrder(root: Object): Object {
   return sortedRoot;
 }
 
-/**
- * Establish the container of a given node. Useful when preserving media queries
- * or other atrules.
- *
- * @param {Object} node PostCSS node.
- * @return {Object} A new root node with an atrule at its base.
- */
-function establishContainer(node: Object): Object {
+function establishContainer(node: postcss.Rule): postcss.AtRule | postcss.Root {
   return node.parent.type === "atrule" && node.parent.name !== "critical"
     ? postcss.atRule({
         name: node.parent.name,
@@ -76,36 +53,24 @@ function establishContainer(node: Object): Object {
     : node.clone();
 }
 
-/**
- * Update a critical root.
- *
- * @param {Object} root Root object to update.
- * @param {Object} update Update object.
- * @return {Object} clonedRoot Root object.
- */
-function updateCritical(root: Object, update: Object): Object {
+function updateCritical(root: postcss.Root, update): Object {
   const clonedRoot = root.clone();
   if (update.type === "rule") {
     clonedRoot.append(clean(update.clone()));
   } else {
-    update.clone().each((rule: Object) => {
+    update.clone().each((rule: postcss.Root) => {
       clonedRoot.append(clean(rule.root()));
     });
   }
   return clonedRoot;
 }
 
-/**
- * Identify critical CSS selectors
- *
- * @param {object} PostCSS CSS object.
- * @param {boolean} Whether or not to remove selectors from primary CSS document.
- * @param {string} Default output CSS file name.
- * @return {object} Object containing critical rules, organized by output destination
- */
-export function getCriticalRules(css: Object, defaultDest: string): Object {
+export function getCriticalRules(
+  css: postcss.Root,
+  defaultDest: string
+): Object {
   const critical: Object = getCriticalFromAtRule({ css, defaultDest });
-  css.walkDecls("critical-selector", (decl: Object) => {
+  css.walkDecls("critical-selector", (decl: postcss.Declaration) => {
     const { parent, value } = decl;
     const dest = getCriticalDestination(parent, defaultDest);
     const container = establishContainer(parent);
@@ -117,7 +82,7 @@ export function getCriticalRules(css: Object, defaultDest: string): Object {
       case "scope":
         // Add all child rules
         const criticalRoot = childRules.reduce(
-          (acc: Object, rule: Object): Object => {
+          (acc: postcss.Root, rule: postcss.Rule): postcss.Root => {
             return acc.append(rule.clone());
           },
           critical[dest].append(container)

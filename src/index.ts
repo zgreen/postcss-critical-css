@@ -144,7 +144,7 @@ function buildCritical(options: Object = {}) {
     ...filteredOptions
   };
   append = false;
-  return (css: Object): Object => {
+  return (css: postcss.Root): Object => {
     const { dryRun, preserve, minify, outputPath, outputDest } = args;
     const criticalOutput = getCriticalRules(css, outputDest);
     return Object.keys(criticalOutput).reduce((_, cur: string): Promise<
