@@ -19,29 +19,29 @@
   "author": "Zach Green",
   "license": "MIT",
   "devDependencies": {
-    "@commitlint/cli": "^8.2.0",
-    "@commitlint/config-conventional": "^8.2.0",
+    "@commitlint/cli": "^8.3.5",
+    "@commitlint/config-conventional": "^8.3.4",
     "babel-cli": "^6.26.0",
     "babel-eslint": "^7.2.3",
     "babel-plugin-transform-flow-strip-types": "^6.8.0",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-preset-es2015": "^6.13.2",
     "eslint": "^3.3.1",
-    "eslint-config-prettier": "^6.9.0",
+    "eslint-config-prettier": "^6.15.0",
     "eslint-config-standard": "^10.2.1",
     "eslint-plugin-flowtype": "^2.50.3",
-    "eslint-plugin-import": "^2.19.1",
+    "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-node": "^4.2.3",
-    "eslint-plugin-prettier": "^3.1.2",
+    "eslint-plugin-prettier": "^3.3.0",
     "eslint-plugin-promise": "^3.8.0",
     "eslint-plugin-standard": "^3.1.0",
     "flow-bin": "^0.100.0",
     "husky": "^3.1.0",
     "lint-staged": "^9.5.0",
-    "minimist": "^1.2.0",
+    "minimist": "^1.2.5",
     "prettier": "1.19.1",
-    "standard-version": "^7.0.1",
-    "tape": "^4.12.1"
+    "standard-version": "^7.1.0",
+    "tape": "^4.13.3"
   },
   "scripts": {
     "build": "eslint src/** && npm run flow && babel src --out-dir dist",
@@ -64,7 +64,7 @@
     "chalk": "^1.1.3",
     "cssnano": "^4.1.10",
     "fs-extra": "^8.1.0",
-    "postcss": "^7.0.25"
+    "postcss": "^7.0.35"
   },
   "husky": {
     "hooks": {
